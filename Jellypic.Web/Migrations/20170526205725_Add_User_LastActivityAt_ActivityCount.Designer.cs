@@ -8,9 +8,10 @@ using Jellypic.Web.Models;
 namespace Jellypic.Web.Migrations
 {
     [DbContext(typeof(JellypicContext))]
-    partial class JellypicContextModelSnapshot : ModelSnapshot
+    [Migration("20170526205725_Add_User_LastActivityAt_ActivityCount")]
+    partial class Add_User_LastActivityAt_ActivityCount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2")

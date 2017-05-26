@@ -78,6 +78,8 @@ namespace Jellypic.Web.Models
         public string Username { get; set; }
         public string PictureUrl { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime LastActivityAt { get; set; }
+        public int ActivityCount { get; set; }
         public DateTime LastLoggedInAt { get; set; }
         public int LoginCount { get; set; }
 
