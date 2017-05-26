@@ -24,7 +24,26 @@ namespace Jellypic.Web.Models
         {
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasIndex(u => u.Username).IsUnique();
+                entity
+                    .Property(u => u.Username)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity
+                    .HasIndex(u => u.Username)
+                    .IsUnique();
+
+                entity
+                    .Property(u => u.PictureUrl)
+                    .HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Post>(entity =>
+            {
+                entity
+                    .Property(p => p.ImageUrl)
+                    .HasMaxLength(500)
+                    .IsRequired();
             });
 
             modelBuilder.Entity<Like>(entity =>
@@ -39,6 +58,10 @@ namespace Jellypic.Web.Models
                 entity.HasOne(c => c.User)
                     .WithMany(u => u.Comments)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity
+                    .Property(c => c.Text)
+                    .IsRequired();
             });
         }
     }
