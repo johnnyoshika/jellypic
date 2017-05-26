@@ -34,6 +34,14 @@ namespace Jellypic.Web.Models
                     .IsUnique();
 
                 entity
+                    .Property(u => u.FirstName)
+                    .HasMaxLength(200);
+
+                entity
+                    .Property(u => u.LastName)
+                    .HasMaxLength(200);
+
+                entity
                     .Property(u => u.PictureUrl)
                     .HasMaxLength(500);
 
@@ -90,6 +98,8 @@ namespace Jellypic.Web.Models
     {
         public int Id { get; set; }
         public string Username { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string PictureUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastActivityAt { get; set; }
