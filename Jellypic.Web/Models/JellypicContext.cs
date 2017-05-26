@@ -48,14 +48,20 @@ namespace Jellypic.Web.Models
 
             modelBuilder.Entity<Like>(entity =>
             {
-                entity.HasOne(l => l.User)
+                entity
+                    .HasOne(l => l.User)
                     .WithMany(u => u.Likes)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity
+                    .HasIndex(l => new { l.UserId, l.PostId })
+                    .IsUnique();
             });
 
             modelBuilder.Entity<Comment>(entity =>
             {
-                entity.HasOne(c => c.User)
+                entity
+                    .HasOne(c => c.User)
                     .WithMany(u => u.Comments)
                     .OnDelete(DeleteBehavior.Restrict);
 
