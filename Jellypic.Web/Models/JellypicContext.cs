@@ -36,6 +36,20 @@ namespace Jellypic.Web.Models
                 entity
                     .Property(u => u.PictureUrl)
                     .HasMaxLength(500);
+
+                entity
+                    .Property(u => u.AuthType)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity
+                    .Property(u => u.AuthUserId)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity
+                    .HasIndex(u => new { u.AuthType, u.AuthUserId })
+                    .IsUnique();
             });
 
             modelBuilder.Entity<Post>(entity =>
@@ -82,6 +96,9 @@ namespace Jellypic.Web.Models
         public int ActivityCount { get; set; }
         public DateTime LastLoggedInAt { get; set; }
         public int LoginCount { get; set; }
+
+        public string AuthType { get; set; }
+        public string AuthUserId { get; set; }
 
         public List<Post> Posts { get; set; }
         public List<Like> Likes { get; set; }
