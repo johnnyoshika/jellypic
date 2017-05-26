@@ -47,7 +47,7 @@ namespace Jellypic.Web.Models
     {
         public int Id { get; set; }
         public string Username { get; set; }
-        public string ProfilePictureUrl { get; set; }
+        public string PictureUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastLoggedInAt { get; set; }
         public int LoginCount { get; set; }
