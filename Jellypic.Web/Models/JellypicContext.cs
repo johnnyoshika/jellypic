@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Jellypic.Web.Models
 {
@@ -10,12 +11,31 @@ namespace Jellypic.Web.Models
     {
         public JellypicContext(DbContextOptions<JellypicContext> options) : base(options)
         {
+
+
         }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Like> Likes { get; set; }
         public DbSet<Comment> Comments { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Like>(entity =>
+            {
+                entity.HasOne(l => l.User)
+                    .WithMany(u => u.Likes)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Comment>(entity =>
+            {
+                entity.HasOne(c => c.User)
+                    .WithMany(u => u.Comments)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+        }
     }
 
     public class User
