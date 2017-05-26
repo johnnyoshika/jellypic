@@ -22,6 +22,11 @@ namespace Jellypic.Web.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasIndex(u => u.Username).IsUnique();
+            });
+
             modelBuilder.Entity<Like>(entity =>
             {
                 entity.HasOne(l => l.User)

@@ -8,9 +8,10 @@ using Jellypic.Web.Models;
 namespace Jellypic.Web.Migrations
 {
     [DbContext(typeof(JellypicContext))]
-    partial class JellypicContextModelSnapshot : ModelSnapshot
+    [Migration("20170526203311_Make_User_Username_Unique")]
+    partial class Make_User_Username_Unique
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2")
