@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Jellypic.Web.Models;
+using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -60,6 +62,22 @@ namespace Jellypic.Web.Controllers
                 Context.Users.Add(user);
 
             await Context.SaveChangesAsync();
+
+            // https://andrewlock.net/introduction-to-authentication-with-asp-net-core/
+            // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/cookie
+            var identity = new ClaimsIdentity(new List<Claim>
+            {
+                new Claim("UserId", user.Id.ToString(), ClaimValueTypes.Integer32),
+                new Claim("Username", user.Username, ClaimValueTypes.String)
+            }, "Cookie");
+
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.Authentication.SignInAsync("JellypicCookie", principal, new AuthenticationProperties
+            {
+                ExpiresUtc = DateTime.UtcNow.AddMonths(6),
+                IsPersistent = true
+            });
         }
     }
 

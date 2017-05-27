@@ -41,6 +41,12 @@ namespace Jellypic.Web
         {
             loggerFactory.AddConsole();
             app.UseMiddleware<ErrorHandlingMiddleware>();
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationScheme = "JellypicCookie",
+                AutomaticAuthenticate = true,
+                CookieName = "auth-token"
+            });
             app.UseMvc();
         }
     }
