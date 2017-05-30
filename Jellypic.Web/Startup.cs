@@ -32,7 +32,7 @@ namespace Jellypic.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
+            services.AddScoped<IUserContext, UserContext>();
             services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]));
         }
 
@@ -47,6 +47,7 @@ namespace Jellypic.Web
                 AutomaticAuthenticate = true,
                 CookieName = "auth-token"
             });
+            app.UseMiddleware<AuthenticationMiddleware>();
             app.UseMvc();
         }
     }

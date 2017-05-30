@@ -5,9 +5,12 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Jellypic.Web.Controllers
@@ -15,17 +18,33 @@ namespace Jellypic.Web.Controllers
     [Route("api/[controller]")]
     public class SessionsController : Controller
     {
-        public SessionsController(JellypicContext context)
+        public SessionsController(IUserContext userContext, JellypicContext dataContext)
         {
-            Context = context;
+            UserContext = userContext;
+            DataContext = dataContext;
         }
 
-        public JellypicContext Context { get; set; }
+        public IUserContext UserContext { get; set; }
+        public JellypicContext DataContext { get; set; }
 
+        [Authorize]
         [HttpGet("me")]
-        public IActionResult Get()
+        public object Get()
         {
-            return Content("Hello world!");
+            var user = DataContext
+                .Users
+                .Include(u => u.Posts)
+                .First(u => u.Id == UserContext.UserId);
+
+            return new
+            {
+                Id = user.Id,
+                Username = user.Username,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PictureUrl = user.PictureUrl,
+                PostCount = user.Posts.Count()
+            };
         }
 
         [HttpPost]
@@ -36,7 +55,7 @@ namespace Jellypic.Web.Controllers
             response.EnsureSuccessStatusCode();
             var data = await response.Content.ReadAsStringAsync();
             var facebookUser = JsonConvert.DeserializeObject<FacebookUserResponse>(data);
-            var user = Context.Users.FirstOrDefault(u => u.AuthType == "Facebook" && u.AuthUserId == facebookUser.Id);
+            var user = DataContext.Users.FirstOrDefault(u => u.AuthType == "Facebook" && u.AuthUserId == facebookUser.Id);
             if (user == null)
             {
                 user = new Models.User();
@@ -59,16 +78,15 @@ namespace Jellypic.Web.Controllers
             user.PictureUrl = facebookPicture.Data.Url;
 
             if (user.Id == 0)
-                Context.Users.Add(user);
+                DataContext.Users.Add(user);
 
-            await Context.SaveChangesAsync();
+            await DataContext.SaveChangesAsync();
 
             // https://andrewlock.net/introduction-to-authentication-with-asp-net-core/
             // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/cookie
             var identity = new ClaimsIdentity(new List<Claim>
             {
-                new Claim("UserId", user.Id.ToString(), ClaimValueTypes.Integer32),
-                new Claim("Username", user.Username, ClaimValueTypes.String)
+                new Claim("UserId", user.Id.ToString(), ClaimValueTypes.Integer32)
             }, "Cookie");
 
             var principal = new ClaimsPrincipal(identity);
