@@ -55,18 +55,18 @@ namespace Jellypic.Web.Controllers
             response.EnsureSuccessStatusCode();
             var data = await response.Content.ReadAsStringAsync();
             var facebookUser = JsonConvert.DeserializeObject<FacebookUserResponse>(data);
-            var user = DataContext.Users.FirstOrDefault(u => u.AuthType == "Facebook" && u.AuthUserId == facebookUser.Id);
+            var user = DataContext.Users.FirstOrDefault(u => u.AuthType == "Facebook" && u.AuthUserId == facebookUser.id);
             if (user == null)
             {
                 user = new Models.User();
                 user.CreatedAt = DateTime.UtcNow;
             }
 
-            user.Username = Regex.Replace(facebookUser.Name.ToLower(), "[^a-z0-9]", string.Empty);
+            user.Username = Regex.Replace(facebookUser.name.ToLower(), "[^a-z0-9]", string.Empty);
             user.AuthType = "Facebook";
-            user.AuthUserId = facebookUser.Id;
-            user.FirstName = facebookUser.FirstName;
-            user.LastName = facebookUser.LastName;
+            user.AuthUserId = facebookUser.id;
+            user.FirstName = facebookUser.first_name;
+            user.LastName = facebookUser.last_name;
             user.LastActivityAt = DateTime.UtcNow;
             user.LastLoggedInAt = DateTime.UtcNow;
             user.ActivityCount++;
@@ -75,7 +75,7 @@ namespace Jellypic.Web.Controllers
             var pictureResponse = await client.GetAsync($"https://graph.facebook.com/me/picture?redirect=false&height=320&width=320&return_ssl_resources=true&access_token={args.AccessToken}");
             var pictureData = await pictureResponse.Content.ReadAsStringAsync();
             var facebookPicture = JsonConvert.DeserializeObject<FacebookPictureResponse>(pictureData);
-            user.PictureUrl = facebookPicture.Data.Url;
+            user.PictureUrl = facebookPicture.data.url;
 
             if (user.Id == 0)
                 DataContext.Users.Add(user);
@@ -106,19 +106,19 @@ namespace Jellypic.Web.Controllers
 
     public class FacebookUserResponse
     {
-        public string Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Name { get; set; }
+        public string id { get; set; }
+        public string first_name { get; set; }
+        public string last_name { get; set; }
+        public string name { get; set; }
     }
 
     public class FacebookPictureResponse
     {
-        public FacebookPictureDataResponse Data { get; set; }
+        public FacebookPictureDataResponse data { get; set; }
     }
 
     public class FacebookPictureDataResponse
     {
-        public string Url { get; set; }
+        public string url { get; set; }
     }
 }
