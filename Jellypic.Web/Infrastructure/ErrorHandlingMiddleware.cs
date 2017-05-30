@@ -25,6 +25,9 @@ namespace Jellypic.Web.Infrastructure
 
                 if (httpContext.Response.StatusCode == (int)HttpStatusCode.Unauthorized)
                     throw new UnauthorizedAccessException("Not authorized!");
+
+                if (httpContext.Response.StatusCode == (int)HttpStatusCode.NotFound)
+                    throw new NotFoundException($"'{httpContext.Request.Path.Value}' not found.");
             }
             catch (Exception ex)
             {
@@ -35,6 +38,9 @@ namespace Jellypic.Web.Infrastructure
         Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             var code = HttpStatusCode.InternalServerError; // 500 if unexpected
+
+            if (exception is NotFoundException)
+                code = HttpStatusCode.NotFound;
 
             if (exception is UnauthorizedAccessException)
                 code = HttpStatusCode.Unauthorized;
