@@ -22,6 +22,9 @@ namespace Jellypic.Web.Infrastructure
             try
             {
                 await Next(httpContext);
+
+                if (httpContext.Response.StatusCode == (int)HttpStatusCode.Unauthorized)
+                    throw new UnauthorizedAccessException("Not authorized!");
             }
             catch (Exception ex)
             {
@@ -32,6 +35,9 @@ namespace Jellypic.Web.Infrastructure
         Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             var code = HttpStatusCode.InternalServerError; // 500 if unexpected
+
+            if (exception is UnauthorizedAccessException)
+                code = HttpStatusCode.Unauthorized;
 
             if (exception is BadRequestException)
                 code = HttpStatusCode.BadRequest;
