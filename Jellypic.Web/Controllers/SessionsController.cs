@@ -24,8 +24,8 @@ namespace Jellypic.Web.Controllers
             DataContext = dataContext;
         }
 
-        public IUserContext UserContext { get; set; }
-        public JellypicContext DataContext { get; set; }
+        IUserContext UserContext { get; set; }
+        JellypicContext DataContext { get; set; }
 
         [Authorize]
         [HttpGet("me")]
