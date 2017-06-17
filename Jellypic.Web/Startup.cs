@@ -31,6 +31,8 @@ namespace Jellypic.Web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            ConfigSettings.Current = new ConfigSettings(Configuration);
+
             services.AddMvc();
             services.AddScoped<IUserContext, UserContext>();
             services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]));
