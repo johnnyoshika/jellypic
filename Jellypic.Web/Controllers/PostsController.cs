@@ -35,7 +35,7 @@ namespace Jellypic.Web.Controllers
                 .Skip(take)
                 .Any();
 
-            var posts = DataContext
+            var posts = await DataContext
                 .Posts
                 .Include(p => p.User)
                 .Include("Likes.User")
@@ -43,7 +43,7 @@ namespace Jellypic.Web.Controllers
                 .Where(p => !after.HasValue || p.Id > after)
                 .OrderByDescending(p => p.Id)
                 .Take(take)
-                .ToList();
+                .ToListAsync();
 
             return new
             {

@@ -29,12 +29,12 @@ namespace Jellypic.Web.Controllers
 
         [Authorize]
         [HttpGet("me")]
-        public object Get()
+        public async Task<object> Get()
         {
-            var user = DataContext
+            var user = await DataContext
                 .Users
                 .Include(u => u.Posts)
-                .First(u => u.Id == UserContext.UserId);
+                .FirstAsync(u => u.Id == UserContext.UserId);
 
             return new
             {
@@ -55,7 +55,7 @@ namespace Jellypic.Web.Controllers
             response.EnsureSuccessStatusCode();
             var data = await response.Content.ReadAsStringAsync();
             var facebookUser = JsonConvert.DeserializeObject<FacebookUserResponse>(data);
-            var user = DataContext.Users.FirstOrDefault(u => u.AuthType == "Facebook" && u.AuthUserId == facebookUser.id);
+            var user = await DataContext.Users.FirstOrDefaultAsync(u => u.AuthType == "Facebook" && u.AuthUserId == facebookUser.id);
             if (user == null)
             {
                 user = new Models.User();
