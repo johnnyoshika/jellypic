@@ -51,7 +51,7 @@ namespace Jellypic.Web.Controllers
                 {
                     Id = p.Id,
                     CreatedAt = p.CreatedAt.ToEpoch(),
-                    ImageUrl = p.ImageUrl,
+                    CloudinaryPublicId = p.CloudinaryPublicId,
                     User = new
                     {
                         Id = p.User.Id,

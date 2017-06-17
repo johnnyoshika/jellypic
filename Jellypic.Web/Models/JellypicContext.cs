@@ -59,8 +59,8 @@ namespace Jellypic.Web.Models
             modelBuilder.Entity<Post>(entity =>
             {
                 entity
-                    .Property(p => p.ImageUrl)
-                    .HasMaxLength(500)
+                    .Property(p => p.CloudinaryPublicId)
+                    .HasMaxLength(50)
                     .IsRequired();
             });
 
@@ -135,7 +135,7 @@ namespace Jellypic.Web.Models
     {
         public int Id { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string ImageUrl { get; set; }
+        public string CloudinaryPublicId { get; set; }
 
         public int UserId { get; set; }
         public User User { get; set; }
