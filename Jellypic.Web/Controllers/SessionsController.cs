@@ -72,11 +72,6 @@ namespace Jellypic.Web.Controllers
             user.ActivityCount++;
             user.LoginCount++;
 
-            var pictureResponse = await client.GetAsync($"https://graph.facebook.com/me/picture?redirect=false&height=320&width=320&return_ssl_resources=true&access_token={args.AccessToken}");
-            var pictureData = await pictureResponse.Content.ReadAsStringAsync();
-            var facebookPicture = JsonConvert.DeserializeObject<FacebookPictureResponse>(pictureData);
-            user.PictureUrl = facebookPicture.data.url;
-
             if (user.Id == 0)
                 DataContext.Users.Add(user);
 

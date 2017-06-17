@@ -42,10 +42,6 @@ namespace Jellypic.Web.Models
                     .HasMaxLength(200);
 
                 entity
-                    .Property(u => u.PictureUrl)
-                    .HasMaxLength(500);
-
-                entity
                     .Property(u => u.AuthType)
                     .HasMaxLength(50)
                     .IsRequired();
@@ -100,7 +96,6 @@ namespace Jellypic.Web.Models
         public string Username { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string PictureUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastActivityAt { get; set; }
         public int ActivityCount { get; set; }
@@ -113,6 +108,27 @@ namespace Jellypic.Web.Models
         public List<Post> Posts { get; set; }
         public List<Like> Likes { get; set; }
         public List<Comment> Comments { get; set; }
+
+        public string PictureUrl {
+            get
+            {
+                if (AuthType == "Facebook")
+                    return $"https://res.cloudinary.com/{ConfigSettings.Current.Cloudinary.CloudName}/image/facebook/c_fill,g_auto:faces,h_152,r_max,w_152/{AuthUserId}.png";
+
+                return null;
+            }
+        }
+
+        public string ThumbUrl
+        {
+            get
+            {
+                if (AuthType == "Facebook")
+                    return $"https://res.cloudinary.com/{ConfigSettings.Current.Cloudinary.CloudName}/image/facebook/c_fill,g_auto:faces,h_30,r_max,w_30/{AuthUserId}.png";
+
+                return null;
+            }
+        }
     }
 
     public class Post
