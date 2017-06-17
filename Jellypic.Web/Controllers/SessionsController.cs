@@ -38,11 +38,12 @@ namespace Jellypic.Web.Controllers
 
             return new
             {
-                Id = user.Id,
-                Username = user.Username,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                PictureUrl = user.PictureUrl,
+                user.Id,
+                user.Username,
+                user.FirstName,
+                user.LastName,
+                user.PictureUrl,
+                user.ThumbUrl,
                 PostCount = user.Posts.Count()
             };
         }

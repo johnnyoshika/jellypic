@@ -49,41 +49,42 @@ namespace Jellypic.Web.Controllers
             {
                 Data = posts.Select(p => new
                 {
-                    Id = p.Id,
+                    p.Id,
                     CreatedAt = p.CreatedAt.ToEpoch(),
-                    CloudinaryPublicId = p.CloudinaryPublicId,
+                    p.CloudinaryPublicId,
                     User = new
                     {
-                        Id = p.User.Id,
-                        Username = p.User.Username,
-                        PictureUrl = p.User.PictureUrl
+                        p.User.Id,
+                        p.User.Username,
+                        p.User.PictureUrl,
+                        p.User.ThumbUrl
                     },
                     Likes = new
                     {
-                        Count = p.Likes.Count,
+                        p.Likes.Count,
                         Data = p.Likes.Select(l => new
                         {
-                            Id = l.Id,
+                            l.Id,
                             CreatedAt = l.CreatedAt.ToEpoch(),
                             User = new
                             {
-                                Id = l.User.Id,
-                                Username = l.User.Username
+                                l.User.Id,
+                                l.User.Username
                             } 
                         })
                     },
                     Comments = new
                     {
-                        Count = p.Comments.Count,
+                        p.Comments.Count,
                         Data = p.Comments.Select(c => new
                         {
-                            Id = c.Id,
+                            c.Id,
                             CreatedAt = c.CreatedAt.ToEpoch(),
-                            Text = c.Text,
+                            c.Text,
                             User = new
                             {
-                                Id = c.User.Id,
-                                Username = c.User.Username
+                                c.User.Id,
+                                c.User.Username
                             }
                         })
                     }
