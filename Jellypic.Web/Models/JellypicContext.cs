@@ -129,6 +129,29 @@ namespace Jellypic.Web.Models
                 return null;
             }
         }
+
+        public object ToJson() =>
+            new
+            {
+                Id,
+                Username,
+                FirstName,
+                LastName,
+                PictureUrl,
+                ThumbUrl
+            };
+
+        public object ToFullJson() =>
+            new
+            {
+                Id,
+                Username,
+                FirstName,
+                LastName,
+                PictureUrl,
+                ThumbUrl,
+                PostCount = Posts.Count()
+            };
     }
 
     public class Post
@@ -142,6 +165,25 @@ namespace Jellypic.Web.Models
 
         public List<Like> Likes { get; set; }
         public List<Comment> Comments { get; set; }
+
+        public object ToJson() =>
+            new
+            {
+                Id,
+                CreatedAt = CreatedAt.ToEpoch(),
+                CloudinaryPublicId,
+                User = User.ToJson(),
+                Likes = new
+                {
+                    Likes.Count,
+                    Data = Likes.Select(l => l.ToJson())
+                },
+                Comments = new
+                {
+                    Comments.Count,
+                    Data = Comments.Select(c => c.ToJson())
+                }
+            };
     }
 
     public class Like
@@ -154,6 +196,14 @@ namespace Jellypic.Web.Models
 
         public int PostId { get; set; }
         public Post Post { get; set; }
+
+        public object ToJson() =>
+            new
+            {
+                Id,
+                CreatedAt = CreatedAt.ToEpoch(),
+                User = User.ToJson()
+            };
     }
 
     public class Comment
@@ -167,5 +217,14 @@ namespace Jellypic.Web.Models
 
         public int PostId { get; set; }
         public Post Post { get; set; }
+
+        public object ToJson() =>
+            new
+            {
+                Id,
+                CreatedAt = CreatedAt.ToEpoch(),
+                Text,
+                User = User.ToJson()
+            };
     }
 }

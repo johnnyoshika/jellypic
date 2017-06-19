@@ -47,48 +47,7 @@ namespace Jellypic.Web.Controllers
 
             return new
             {
-                Data = posts.Select(p => new
-                {
-                    p.Id,
-                    CreatedAt = p.CreatedAt.ToEpoch(),
-                    p.CloudinaryPublicId,
-                    User = new
-                    {
-                        p.User.Id,
-                        p.User.Username,
-                        p.User.PictureUrl,
-                        p.User.ThumbUrl
-                    },
-                    Likes = new
-                    {
-                        p.Likes.Count,
-                        Data = p.Likes.Select(l => new
-                        {
-                            l.Id,
-                            CreatedAt = l.CreatedAt.ToEpoch(),
-                            User = new
-                            {
-                                l.User.Id,
-                                l.User.Username
-                            } 
-                        })
-                    },
-                    Comments = new
-                    {
-                        p.Comments.Count,
-                        Data = p.Comments.Select(c => new
-                        {
-                            c.Id,
-                            CreatedAt = c.CreatedAt.ToEpoch(),
-                            c.Text,
-                            User = new
-                            {
-                                c.User.Id,
-                                c.User.Username
-                            }
-                        })
-                    }
-                }),
+                Data = posts.Select(p => p.ToJson()),
                 Pagination = new
                 {
                     NextUrl = hasMore ? $"/api/posts?after={posts.Last().Id}" : null

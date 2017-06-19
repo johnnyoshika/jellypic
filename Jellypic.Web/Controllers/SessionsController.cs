@@ -29,24 +29,12 @@ namespace Jellypic.Web.Controllers
 
         [Authorize]
         [HttpGet("me")]
-        public async Task<object> Get()
-        {
-            var user = await DataContext
+        public async Task<object> Get() =>
+            (await DataContext
                 .Users
                 .Include(u => u.Posts)
-                .FirstAsync(u => u.Id == UserContext.UserId);
-
-            return new
-            {
-                user.Id,
-                user.Username,
-                user.FirstName,
-                user.LastName,
-                user.PictureUrl,
-                user.ThumbUrl,
-                PostCount = user.Posts.Count()
-            };
-        }
+                .FirstAsync(u => u.Id == UserContext.UserId))
+                .ToFullJson();
 
         [HttpPost]
         public async Task Post([FromBody] SessionsPostArgs args)
