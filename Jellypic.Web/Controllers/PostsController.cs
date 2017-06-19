@@ -24,7 +24,7 @@ namespace Jellypic.Web.Controllers
         JellypicContext DataContext { get; set; }
 
         [HttpGet]
-        public async Task<object> Index(int? after = null)
+        public async Task<object> Get(int? after = null)
         {
             int take = 20;
 
@@ -55,5 +55,41 @@ namespace Jellypic.Web.Controllers
 
             };
         }
+
+        [HttpPost]
+        public async Task<object> Post([FromBody]IEnumerable<PostsPostArgs> data)
+        {
+            var posts = new List<Post>();
+            foreach (var post in data)
+                posts.Add(new Post
+                {
+                    CreatedAt = DateTime.UtcNow,
+                    CloudinaryPublicId = post.CloudinaryPublicId,
+                    UserId = UserContext.UserId
+                });
+
+            DataContext.Posts.AddRange(posts);
+            await DataContext.SaveChangesAsync();
+
+            posts = await DataContext
+                .Posts
+                .Include(p => p.User)
+                .Include("Likes.User")
+                .Include("Comments.User")
+                .Where(p => posts.Select(x => x.Id).Contains(p.Id))
+                .OrderByDescending(p => p.Id)
+                .ToListAsync();
+
+            return new
+            {
+                Data = posts.Select(p => p.ToJson())
+
+            };
+        }
+    }
+
+    public class PostsPostArgs
+    {
+        public string CloudinaryPublicId { get; set; }
     }
 }

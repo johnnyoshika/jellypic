@@ -47,7 +47,7 @@ namespace Jellypic.Web.Controllers
             var user = await DataContext.Users.FirstOrDefaultAsync(u => u.AuthType == "Facebook" && u.AuthUserId == facebookUser.id);
             if (user == null)
             {
-                user = new Models.User();
+                user = new User();
                 user.CreatedAt = DateTime.UtcNow;
             }
 
