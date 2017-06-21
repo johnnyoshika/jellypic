@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
@@ -28,20 +29,11 @@ namespace Jellypic.Web.Controllers
         {
             int take = 20;
 
-            bool hasMore = DataContext
-                .Posts
-                .Where(p => !after.HasValue || p.Id > after)
-                .OrderByDescending(p => p.Id)
+            bool hasMore = await Read(p => !after.HasValue || p.Id > after)
                 .Skip(take)
-                .Any();
+                .AnyAsync();
 
-            var posts = await DataContext
-                .Posts
-                .Include(p => p.User)
-                .Include("Likes.User")
-                .Include("Comments.User")
-                .Where(p => !after.HasValue || p.Id > after)
-                .OrderByDescending(p => p.Id)
+            var posts = await Read(p => !after.HasValue || p.Id > after)
                 .Take(take)
                 .ToListAsync();
 
@@ -71,21 +63,23 @@ namespace Jellypic.Web.Controllers
             DataContext.Posts.AddRange(posts);
             await DataContext.SaveChangesAsync();
 
-            posts = await DataContext
+            return new
+            {
+                Data = (await Read(p => posts.Select(x => x.Id).Contains(p.Id))
+                        .ToListAsync())
+                    .Select(p => p.ToJson())
+
+            };
+        }
+
+        IQueryable<Post> Read(Expression<Func<Post, bool>> filter) =>
+            DataContext
                 .Posts
                 .Include(p => p.User)
                 .Include("Likes.User")
                 .Include("Comments.User")
-                .Where(p => posts.Select(x => x.Id).Contains(p.Id))
-                .OrderByDescending(p => p.Id)
-                .ToListAsync();
-
-            return new
-            {
-                Data = posts.Select(p => p.ToJson())
-
-            };
-        }
+                .Where(filter)
+                .OrderByDescending(p => p.Id);
     }
 
     public class PostsPostArgs
