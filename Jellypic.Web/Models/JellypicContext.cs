@@ -140,18 +140,6 @@ namespace Jellypic.Web.Models
                 PictureUrl,
                 ThumbUrl
             };
-
-        public object ToFullJson() =>
-            new
-            {
-                Id,
-                Username,
-                FirstName,
-                LastName,
-                PictureUrl,
-                ThumbUrl,
-                PostCount = Posts.Count()
-            };
     }
 
     public class Post

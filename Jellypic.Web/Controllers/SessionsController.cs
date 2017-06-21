@@ -34,7 +34,7 @@ namespace Jellypic.Web.Controllers
                 .Users
                 .Include(u => u.Posts)
                 .FirstAsync(u => u.Id == UserContext.UserId))
-                .ToFullJson();
+                .ToJson();
 
         [HttpPost]
         public async Task Post([FromBody] SessionsPostArgs args)
