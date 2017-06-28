@@ -161,16 +161,8 @@ namespace Jellypic.Web.Models
                 CreatedAt = CreatedAt.ToEpoch(),
                 CloudinaryPublicId,
                 User = User.ToJson(),
-                Likes = new
-                {
-                    Likes.Count,
-                    Data = Likes.Select(l => l.ToJson())
-                },
-                Comments = new
-                {
-                    Comments.Count,
-                    Data = Comments.Select(c => c.ToJson())
-                }
+                Likes = Likes.Select(l => l.ToJson()),
+                Comments = Comments.Select(c => c.ToJson())
             };
     }
 
