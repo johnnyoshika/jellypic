@@ -12,10 +12,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Jellypic.Web.Controllers
 {
     [Authorize]
-    [Route("api/likes")]
-    public class LikeController : Controller
+    [Route("api/posts/{id}/likes")]
+    public class PostLikeController : Controller
     {
-        public LikeController(IUserContext userContext, JellypicContext dataContext)
+        public PostLikeController(IUserContext userContext, JellypicContext dataContext)
         {
             UserContext = userContext;
             DataContext = dataContext;
@@ -24,46 +24,45 @@ namespace Jellypic.Web.Controllers
         IUserContext UserContext { get; }
         JellypicContext DataContext { get; }
 
-        [HttpPost]
-        public async Task<object> Post([FromBody]LikesPostArgs data)
+        [HttpPut]
+        public async Task<object> Put(int id)
         {
-            var like = await Read(l => l.UserId == UserContext.UserId && l.PostId == data.PostId);
+            var like = await ReadLikeAsync(l => l.UserId == UserContext.UserId && l.PostId == id);
             if (like != null)
-                return like.ToJson();
+                return (await ReadPostAsync(id)).ToJson();
 
             like = new Like
             {
-                PostId = data.PostId,
+                PostId = id,
                 UserId = UserContext.UserId,
                 CreatedAt = DateTime.UtcNow
             };
 
             DataContext.Likes.Add(like);
             await DataContext.SaveChangesAsync();
-            return (await Read(l => l.Id == like.Id)).ToJson();
+            return (await ReadPostAsync(id)).ToJson();
         }
 
-        [HttpDelete("{id}")]
-        public async Task Delete(int id)
+        [HttpDelete]
+        public async Task<object> Delete(int id)
         {
-            var like = await Read(l => l.Id == id && l.UserId == UserContext.UserId);
-
+            var like = await ReadLikeAsync(l => l.PostId == id && l.UserId == UserContext.UserId);
             if (like == null)
-                throw new NotFoundException($"Like {id} for user {UserContext.UserId} not found.");
+                return (await ReadPostAsync(id)).ToJson();
 
             DataContext.Likes.Remove(like);
             await DataContext.SaveChangesAsync();
+            return (await ReadPostAsync(id)).ToJson();
         }
 
-        async Task<Like> Read(Expression<Func<Like, bool>> filter) =>
+        async Task<Post> ReadPostAsync(int id) =>
+            await DataContext
+                .ReadPosts(p => p.Id == id)
+                .FirstOrDefaultAsync();
+
+        async Task<Like> ReadLikeAsync(Expression<Func<Like, bool>> filter) =>
             await DataContext
                 .Likes
-                .Include(l => l.User)
                 .FirstOrDefaultAsync(filter);
-    }
-
-    public class LikesPostArgs
-    {
-        public int PostId { get; set; }
     }
 }

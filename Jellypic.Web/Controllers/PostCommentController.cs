@@ -12,10 +12,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Jellypic.Web.Controllers
 {
     [Authorize]
-    [Route("api/comments")]
-    public class CommentController : Controller
+    [Route("api/posts/{id}/comments")]
+    public class PostCommentController : Controller
     {
-        public CommentController(IUserContext userContext, JellypicContext dataContext)
+        public PostCommentController(IUserContext userContext, JellypicContext dataContext)
         {
             UserContext = userContext;
             DataContext = dataContext;
@@ -25,11 +25,11 @@ namespace Jellypic.Web.Controllers
         JellypicContext DataContext { get; }
 
         [HttpPost]
-        public async Task<object> Post([FromBody]CommentPostArgs data)
+        public async Task<object> Post(int id, [FromBody]CommentPostArgs data)
         {
             var comment = new Comment
             {
-                PostId = data.PostId,
+                PostId = id,
                 UserId = UserContext.UserId,
                 Text = data.Text,
                 CreatedAt = DateTime.UtcNow
@@ -37,22 +37,27 @@ namespace Jellypic.Web.Controllers
 
             DataContext.Comments.Add(comment);
             await DataContext.SaveChangesAsync();
-            return (await Read(c => c.Id == comment.Id)).ToJson();
+            return (await ReadPostAsync(id)).ToJson();
         }
 
-        [HttpDelete("{id}")]
-        public async Task Delete(int id)
+        [HttpDelete("{commentId}")]
+        public async Task<object> Delete(int id, int commentId)
         {
-            var comment = await Read(c => c.Id == id && c.UserId == UserContext.UserId);
-
+            var comment = await ReadAsync(c => c.Id == commentId && c.UserId == UserContext.UserId);
             if (comment == null)
-                throw new NotFoundException($"Comment {id} for user {UserContext.UserId} not found.");
+                return (await ReadPostAsync(id)).ToJson();
 
             DataContext.Comments.Remove(comment);
             await DataContext.SaveChangesAsync();
+            return (await ReadPostAsync(id)).ToJson();
         }
 
-        async Task<Comment> Read(Expression<Func<Comment, bool>> filter) =>
+        async Task<Post> ReadPostAsync(int id) =>
+            await DataContext
+                .ReadPosts(p => p.Id == id)
+                .FirstOrDefaultAsync();
+
+        async Task<Comment> ReadAsync(Expression<Func<Comment, bool>> filter) =>
             await DataContext
                 .Comments
                 .Include(c => c.User)
@@ -61,7 +66,6 @@ namespace Jellypic.Web.Controllers
 
     public class CommentPostArgs
     {
-        public int PostId { get; set; }
         public string Text { get; set; }
     }
 }

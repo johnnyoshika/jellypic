@@ -29,11 +29,11 @@ namespace Jellypic.Web.Controllers
         {
             int take = 20;
 
-            bool hasMore = await Read(p => !after.HasValue || p.Id > after)
+            bool hasMore = await DataContext.ReadPosts(p => !after.HasValue || p.Id > after)
                 .Skip(take)
                 .AnyAsync();
 
-            var posts = await Read(p => !after.HasValue || p.Id > after)
+            var posts = await DataContext.ReadPosts(p => !after.HasValue || p.Id > after)
                 .Take(take)
                 .ToListAsync();
 
@@ -65,21 +65,12 @@ namespace Jellypic.Web.Controllers
 
             return new
             {
-                Data = (await Read(p => posts.Select(x => x.Id).Contains(p.Id))
+                Data = (await DataContext.ReadPosts(p => posts.Select(x => x.Id).Contains(p.Id))
                         .ToListAsync())
                     .Select(p => p.ToJson())
 
             };
         }
-
-        IQueryable<Post> Read(Expression<Func<Post, bool>> filter) =>
-            DataContext
-                .Posts
-                .Include(p => p.User)
-                .Include("Likes.User")
-                .Include("Comments.User")
-                .Where(filter)
-                .OrderByDescending(p => p.Id);
     }
 
     public class PostPostArgs
