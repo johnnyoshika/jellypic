@@ -15,10 +15,10 @@ using Newtonsoft.Json;
 
 namespace Jellypic.Web.Controllers
 {
-    [Route("api/[controller]")]
-    public class SessionsController : Controller
+    [Route("api/sessions")]
+    public class SessionController : Controller
     {
-        public SessionsController(IUserContext userContext, JellypicContext dataContext)
+        public SessionController(IUserContext userContext, JellypicContext dataContext)
         {
             UserContext = userContext;
             DataContext = dataContext;
@@ -37,7 +37,7 @@ namespace Jellypic.Web.Controllers
                 .ToJson();
 
         [HttpPost]
-        public async Task Post([FromBody] SessionsPostArgs args)
+        public async Task Post([FromBody] SessionPostArgs args)
         {
             var client = new HttpClient();
             var response = await client.GetAsync($"https://graph.facebook.com/me?fields=id,first_name,last_name,name&access_token={args.AccessToken}");
@@ -83,7 +83,7 @@ namespace Jellypic.Web.Controllers
         }
     }
 
-    public class SessionsPostArgs
+    public class SessionPostArgs
     {
         public string AccessToken { get; set; }
     }

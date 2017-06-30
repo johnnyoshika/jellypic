@@ -12,10 +12,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Jellypic.Web.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
-    public class LikesController : Controller
+    [Route("api/likes")]
+    public class LikeController : Controller
     {
-        public LikesController(IUserContext userContext, JellypicContext dataContext)
+        public LikeController(IUserContext userContext, JellypicContext dataContext)
         {
             UserContext = userContext;
             DataContext = dataContext;

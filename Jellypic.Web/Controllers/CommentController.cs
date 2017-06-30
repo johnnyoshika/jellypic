@@ -12,10 +12,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Jellypic.Web.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
-    public class CommentsController : Controller
+    [Route("api/comments")]
+    public class CommentController : Controller
     {
-        public CommentsController(IUserContext userContext, JellypicContext dataContext)
+        public CommentController(IUserContext userContext, JellypicContext dataContext)
         {
             UserContext = userContext;
             DataContext = dataContext;
@@ -25,7 +25,7 @@ namespace Jellypic.Web.Controllers
         JellypicContext DataContext { get; }
 
         [HttpPost]
-        public async Task<object> Post([FromBody]CommentsPostArgs data)
+        public async Task<object> Post([FromBody]CommentPostArgs data)
         {
             var comment = new Comment
             {
@@ -59,7 +59,7 @@ namespace Jellypic.Web.Controllers
                 .FirstOrDefaultAsync(filter);
     }
 
-    public class CommentsPostArgs
+    public class CommentPostArgs
     {
         public int PostId { get; set; }
         public string Text { get; set; }

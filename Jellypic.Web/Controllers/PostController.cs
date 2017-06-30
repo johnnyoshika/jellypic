@@ -12,10 +12,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Jellypic.Web.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
-    public class PostsController : Controller
+    [Route("api/posts")]
+    public class PostController : Controller
     {
-        public PostsController(IUserContext userContext, JellypicContext dataContext)
+        public PostController(IUserContext userContext, JellypicContext dataContext)
         {
             UserContext = userContext;
             DataContext = dataContext;
@@ -49,7 +49,7 @@ namespace Jellypic.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<object> Post([FromBody]IEnumerable<PostsPostArgs> data)
+        public async Task<object> Post([FromBody]IEnumerable<PostPostArgs> data)
         {
             var posts = new List<Post>();
             foreach (var post in data)
@@ -82,7 +82,7 @@ namespace Jellypic.Web.Controllers
                 .OrderByDescending(p => p.Id);
     }
 
-    public class PostsPostArgs
+    public class PostPostArgs
     {
         public string CloudinaryPublicId { get; set; }
     }
