@@ -48,6 +48,16 @@ namespace Jellypic.Web.Controllers
             };
         }
 
+        [HttpGet("{id}")]
+        public async Task<object> Get(int id)
+        {
+            var post = await DataContext.ReadPosts(p => p.Id == id).FirstOrDefaultAsync();
+            if (post == null)
+                throw new NotFoundException($"'{HttpContext.Request.Path.Value}' not found.");
+
+            return post.ToJson();
+        }
+
         [HttpPost]
         public async Task<object> Post([FromBody]IEnumerable<PostPostArgs> data)
         {
