@@ -19,6 +19,7 @@ namespace Jellypic.Web.Models
         public DbSet<Post> Posts { get; set; }
         public DbSet<Like> Likes { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -86,6 +87,24 @@ namespace Jellypic.Web.Models
                 entity
                     .Property(c => c.Text)
                     .IsRequired();
+            });
+
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity
+                    .HasOne(n => n.Actor)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity
+                    .HasOne(n => n.Recipient)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity
+                    .HasOne(n => n.Post)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }
@@ -206,5 +225,30 @@ namespace Jellypic.Web.Models
                 Text,
                 User = User.ToJson()
             };
+    }
+
+    public class Notification
+    {
+        public int Id { get; set; }
+        public DateTime CreatedAt { get; set; }
+
+        public int ActorId { get; set; }
+        public User Actor { get; set; }
+
+        public int RecipientId { get; set; }
+        public User Recipient { get; set; }
+
+        public int PostId { get; set; }
+        public Post Post { get; set; }
+
+        public NotificationType Type { get; set; }
+
+        public bool Dismissed { get; set; }
+    }
+
+    public enum NotificationType
+    {
+        Like = 1,
+        Comment = 2
     }
 }
