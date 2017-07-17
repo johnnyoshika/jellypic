@@ -27,17 +27,27 @@ namespace Jellypic.Web.Controllers
         [HttpPost]
         public async Task<object> Post(int id, [FromBody]CommentPostArgs data)
         {
-            var comment = new Comment
+            var post = await ReadPostAsync(id);
+            DataContext.Comments.Add(new Comment
             {
                 PostId = id,
                 UserId = UserContext.UserId,
                 Text = data.Text,
                 CreatedAt = DateTime.UtcNow
-            };
+            });
 
-            DataContext.Comments.Add(comment);
+            if (UserContext.UserId != post.UserId)
+                DataContext.Notifications.Add(new Notification
+                {
+                    ActorId = UserContext.UserId,
+                    PostId = id,
+                    RecipientId = post.UserId,
+                    CreatedAt = DateTime.UtcNow,
+                    Type = NotificationType.Comment
+                });
+
             await DataContext.SaveChangesAsync();
-            return (await ReadPostAsync(id)).ToJson();
+            return post.ToJson();
         }
 
         [HttpDelete("{commentId}")]
