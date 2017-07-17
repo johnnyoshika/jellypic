@@ -244,6 +244,20 @@ namespace Jellypic.Web.Models
         public NotificationType Type { get; set; }
 
         public bool Dismissed { get; set; }
+
+        public object ToJson() =>
+            new
+            {
+                Id,
+                CreatedAt = CreatedAt.ToEpoch(),
+                Actor = Actor.ToJson(),
+                Post = new
+                {
+                    Id = Post.Id,
+                    CloudinaryPublicId = Post.CloudinaryPublicId
+                },
+                Type
+            };
     }
 
     public enum NotificationType
