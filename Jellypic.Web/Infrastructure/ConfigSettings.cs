@@ -10,10 +10,10 @@ namespace Jellypic.Web
     {
         public static ConfigSettings Current;
 
-        public ConfigSettings(IConfigurationRoot root)
+        public ConfigSettings(IConfiguration configuration)
         {
-            Cloudinary = new CloudinarySettings(root.GetSection("Cloudinary"));
-            WebPushVapidKeys = new WebPushVapidKeys(root.GetSection("WebPushVapidKeys"));
+            Cloudinary = new CloudinarySettings(configuration.GetSection("Cloudinary"));
+            WebPushVapidKeys = new WebPushVapidKeys(configuration.GetSection("WebPushVapidKeys"));
         }
 
         public CloudinarySettings Cloudinary { get; }
