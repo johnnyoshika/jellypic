@@ -34,6 +34,12 @@ namespace Jellypic.Web
                 .AddCookie(o =>
                 {
                     o.Cookie.Name = "auth-token";
+                    o.Events.OnRedirectToLogin = context =>
+                     {
+                         context.Response.Headers["Location"] = context.RedirectUri;
+                         context.Response.StatusCode = 401;
+                         return Task.CompletedTask;
+                     };
                 });
 
             services.AddMvc();
