@@ -7,8 +7,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -75,7 +75,7 @@ namespace Jellypic.Web.Controllers
 
             var principal = new ClaimsPrincipal(identity);
 
-            await HttpContext.Authentication.SignInAsync("JellypicCookie", principal, new AuthenticationProperties
+            await HttpContext.SignInAsync(principal, new AuthenticationProperties
             {
                 ExpiresUtc = DateTime.UtcNow.AddMonths(6),
                 IsPersistent = true
