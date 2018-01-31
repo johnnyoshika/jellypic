@@ -20,6 +20,7 @@ namespace Jellypic.Web.Models
         public DbSet<Like> Likes { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -105,6 +106,29 @@ namespace Jellypic.Web.Models
                     .HasOne(n => n.Post)
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Subscription>(entity =>
+            {
+                entity
+                    .HasOne(s => s.User)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity
+                    .Property(s => s.Endpoint)
+                    .HasMaxLength(2048)
+                    .IsRequired();
+
+                entity
+                    .Property(s => s.P256DH)
+                    .HasMaxLength(2048)
+                    .IsRequired();
+
+                entity
+                    .Property(s => s.Auth)
+                    .HasMaxLength(2048)
+                    .IsRequired();
             });
         }
     }
@@ -264,5 +288,15 @@ namespace Jellypic.Web.Models
     {
         Like = 1,
         Comment = 2
+    }
+
+    public class Subscription
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public User User { get; set; }
+        public string Endpoint { get; set; }
+        public string P256DH { get; set; }
+        public string Auth { get; set; }
     }
 }
