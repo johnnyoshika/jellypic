@@ -11,9 +11,10 @@ using System;
 namespace Jellypic.Web.Migrations
 {
     [DbContext(typeof(JellypicContext))]
-    partial class JellypicContextModelSnapshot : ModelSnapshot
+    [Migration("20180131202829_EF_Core_2_Upgrade")]
+    partial class EF_Core_2_Upgrade
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
