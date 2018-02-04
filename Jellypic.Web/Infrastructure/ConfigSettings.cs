@@ -25,9 +25,13 @@ namespace Jellypic.Web
         public CloudinarySettings(IConfigurationSection section)
         {
             CloudName = section["CloudName"];
+            ApiKey = section["ApiKey"];
+            ApiSecret = section["ApiSecret"];
         }
 
         public string CloudName { get; }
+        public string ApiKey { get; }
+        public string ApiSecret { get; }
     }
 
     public class WebPushVapidKeys
