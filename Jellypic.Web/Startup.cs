@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Jellypic.Web.Infrastructure;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Jellypic.Web.Base;
 
 namespace Jellypic.Web
 {
@@ -44,6 +45,7 @@ namespace Jellypic.Web
 
             services.AddMvc();
             services.AddScoped<IUserContext, UserContext>();
+            services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]));
         }
 
