@@ -56,6 +56,7 @@ namespace Jellypic.Web.Events
 
         public async Task HandleAsync(NotifyEvent e)
         {
+            var cloudinary = new CloudinaryUrlBuilder();
             var pushSender = new WebPushSender();
             foreach (var subscription in await DataContext.Subscriptions.Where(s => s.UserId == e.Data.Post.UserId).ToListAsync())
             {
@@ -65,8 +66,8 @@ namespace Jellypic.Web.Events
                     title = $"New {e.Data.Type}",
                     message = $"From {actor.FirstName} {actor.LastName} (@{actor.Username})",
                     postId = e.Data.Post.Id,
-                    //icon = "", // TODO: get url from cloudinary sdk
-                    //badge = ""
+                    icon = cloudinary.Square(e.Data.Post.CloudinaryPublicId, 196), // At least 192px recommended: https://developers.google.com/web/fundamentals/push-notifications/display-a-notification
+                    //badge = "" // TODO
                 });
             }
         }
