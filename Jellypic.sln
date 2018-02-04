@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jellypic.Web", "Jellypic.Web\Jellypic.Web.csproj", "{89E42568-59E4-4A23-B620-F524E61CF096}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jellypic.Web", "Jellypic.Web\Jellypic.Web.csproj", "{89E42568-59E4-4A23-B620-F524E61CF096}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +18,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A719EDE6-2712-41DF-93E4-F9E6F1F14B0A}
 	EndGlobalSection
 EndGlobal
