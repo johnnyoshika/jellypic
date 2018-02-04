@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Jellypic.Web.Base;
+using Jellypic.Web.Common;
 using Jellypic.Web.Events;
 using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
@@ -17,16 +18,16 @@ namespace Jellypic.Web.Controllers
     [Route("api/posts/{id}/comments")]
     public class PostCommentController : Controller
     {
-        public PostCommentController(IUserContext userContext, JellypicContext dataContext, IEventDispatcher eventDispatcher)
+        public PostCommentController(IUserContext userContext, JellypicContext dataContext, INotificationCreator notificationCreator)
         {
             UserContext = userContext;
             DataContext = dataContext;
-            EventDispatcher = eventDispatcher;
+            NotificationCreator = notificationCreator;
         }
 
         IUserContext UserContext { get; }
         JellypicContext DataContext { get; }
-        IEventDispatcher EventDispatcher { get; }
+        INotificationCreator NotificationCreator { get; }
 
         [HttpPost]
         public async Task<object> Post(int id, [FromBody]CommentPostArgs data)
@@ -41,17 +42,7 @@ namespace Jellypic.Web.Controllers
             });
 
             if (UserContext.UserId != post.UserId)
-                await EventDispatcher.DispatchAsync(new NotifyEvent
-                {
-                    Notification = new Notification
-                    {
-                        ActorId = UserContext.UserId,
-                        PostId = id,
-                        RecipientId = post.UserId,
-                        CreatedAt = DateTime.UtcNow,
-                        Type = NotificationType.Comment
-                    }
-                });
+                await NotificationCreator.CreateAsync(UserContext.UserId, post, NotificationType.Comment);
 
             await DataContext.SaveChangesAsync();
             return post.ToJson();
