@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Jellypic.Web.Base;
+using Jellypic.Web.Events;
 using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -15,14 +17,16 @@ namespace Jellypic.Web.Controllers
     [Route("api/posts/{id}/comments")]
     public class PostCommentController : Controller
     {
-        public PostCommentController(IUserContext userContext, JellypicContext dataContext)
+        public PostCommentController(IUserContext userContext, JellypicContext dataContext, IEventDispatcher eventDispatcher)
         {
             UserContext = userContext;
             DataContext = dataContext;
+            EventDispatcher = eventDispatcher;
         }
 
         IUserContext UserContext { get; }
         JellypicContext DataContext { get; }
+        IEventDispatcher EventDispatcher { get; }
 
         [HttpPost]
         public async Task<object> Post(int id, [FromBody]CommentPostArgs data)
@@ -37,13 +41,16 @@ namespace Jellypic.Web.Controllers
             });
 
             if (UserContext.UserId != post.UserId)
-                DataContext.Notifications.Add(new Notification
+                await EventDispatcher.DispatchAsync(new NotifyEvent
                 {
-                    ActorId = UserContext.UserId,
-                    PostId = id,
-                    RecipientId = post.UserId,
-                    CreatedAt = DateTime.UtcNow,
-                    Type = NotificationType.Comment
+                    Notification = new Notification
+                    {
+                        ActorId = UserContext.UserId,
+                        PostId = id,
+                        RecipientId = post.UserId,
+                        CreatedAt = DateTime.UtcNow,
+                        Type = NotificationType.Comment
+                    }
                 });
 
             await DataContext.SaveChangesAsync();

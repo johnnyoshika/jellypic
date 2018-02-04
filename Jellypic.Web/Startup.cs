@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Jellypic.Web.Infrastructure;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Jellypic.Web.Base;
+using Jellypic.Web.Events;
 
 namespace Jellypic.Web
 {
@@ -46,7 +47,9 @@ namespace Jellypic.Web
             services.AddMvc();
             services.AddScoped<IUserContext, UserContext>();
             services.AddScoped<IEventDispatcher, EventDispatcher>();
-            services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]));
+            services.AddScoped<IEventHandler<NotifyEvent>, NotificationWriter>();
+            services.AddScoped<IEventHandler<NotifyEvent>, NotificationSender>();
+            services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]), ServiceLifetime.Transient);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
