@@ -14,6 +14,7 @@ using Jellypic.Web.Infrastructure;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Jellypic.Web.Base;
 using Jellypic.Web.Events;
+using Jellypic.Web.Common;
 
 namespace Jellypic.Web
 {
@@ -49,6 +50,7 @@ namespace Jellypic.Web
             services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationWriter>();
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationSender>();
+            services.AddScoped<INotificationCreator, NotificationCreator>();
             services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]), ServiceLifetime.Transient);
         }
 
