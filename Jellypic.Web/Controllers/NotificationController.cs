@@ -35,22 +35,5 @@ namespace Jellypic.Web.Controllers
                 .Where(n => n.RecipientId == UserContext.UserId && !n.Dismissed)
                 .Select(n => n.ToJson())
                 .ToListAsync();
-
-        [HttpPost("send")]
-        public async Task Send()
-        {
-            var sender = new WebPushSender();
-            foreach (var s in DataContext.Subscriptions)
-                await sender.SendAsync(
-                    s.Endpoint,
-                    s.P256DH,
-                    s.Auth,
-                    new
-                    {
-                        title = "Push test!",
-                        message = "New notification!",
-                        path = "profile"
-                    });
-        }
     }
 }
