@@ -6,6 +6,7 @@ using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Jellypic.Web.Controllers
 {
@@ -33,6 +34,17 @@ namespace Jellypic.Web.Controllers
                 Auth = args.Keys.Auth
             });
 
+            await DataContext.SaveChangesAsync();
+        }
+
+        [HttpDelete]
+        public async Task Delete(string endpoint)
+        {
+            var subscription = await DataContext.Subscriptions.FirstOrDefaultAsync(s => s.Endpoint == endpoint);
+            if (subscription == null)
+                return;
+
+            DataContext.Subscriptions.Remove(subscription);
             await DataContext.SaveChangesAsync();
         }
     }
