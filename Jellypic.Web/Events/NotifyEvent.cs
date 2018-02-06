@@ -47,21 +47,22 @@ namespace Jellypic.Web.Events
 
     public class NotificationSender : IEventHandler<NotifyEvent>
     {
-        public NotificationSender(JellypicContext dataContext)
+        public NotificationSender(JellypicContext dataContext, IWebPushSender webPushSender)
         {
             DataContext = dataContext;
+            WebPushSender = webPushSender;
         }
 
         JellypicContext DataContext { get; }
+        IWebPushSender WebPushSender { get; }
 
         public async Task HandleAsync(NotifyEvent e)
         {
             var cloudinary = new CloudinaryUrlBuilder();
-            var pushSender = new WebPushSender();
             foreach (var subscription in await DataContext.Subscriptions.Where(s => s.UserId == e.Data.Post.UserId).ToListAsync())
             {
                 var actor = await DataContext.Users.FirstAsync(u => u.Id == e.Data.ActorId);
-                await pushSender.SendAsync(subscription.Endpoint, subscription.P256DH, subscription.Auth, new
+                await WebPushSender.SendAsync(subscription.Endpoint, subscription.P256DH, subscription.Auth, new
                 {
                     title = $"New {e.Data.Type}",
                     message = $"From {actor.FirstName} {actor.LastName} (@{actor.Username})",

@@ -51,6 +51,7 @@ namespace Jellypic.Web
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationWriter>();
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationSender>();
             services.AddScoped<INotificationCreator, NotificationCreator>();
+            services.AddScoped<IWebPushSender, WebPushSender>();
             services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]), ServiceLifetime.Transient);
         }
 
