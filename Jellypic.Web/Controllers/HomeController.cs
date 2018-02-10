@@ -10,7 +10,7 @@ namespace Jellypic.Web.Controllers
     public class HomeController : Controller
     {
         public IActionResult Index() =>
-            Content($"Jellypic: {DateTime.Now.ToString("t")}");
+            File("~/index.html", "text/html");
 
         [HttpGet("favicon.ico")]
         public IActionResult Favicon() =>

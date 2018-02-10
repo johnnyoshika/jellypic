@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Jellypic.Web.Base;
 using Jellypic.Web.Events;
 using Jellypic.Web.Common;
+using System.IO;
 
 namespace Jellypic.Web
 {
@@ -62,6 +63,16 @@ namespace Jellypic.Web
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseAuthentication();
             app.UseMiddleware<AuthenticationMiddleware>();
+
+            app.UseStaticFiles();
+            app.Use(async (context, next) =>
+            {
+                var path = context.Request.Path.Value;
+                if (!path.StartsWith("/api") && !Path.HasExtension(path))
+                    context.Request.Path = "/";
+
+                await next();
+            });
             app.UseMvc();
         }
     }
