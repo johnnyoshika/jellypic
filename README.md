@@ -3,6 +3,9 @@
 * Create `appsettings.development.json`
 * Copy contents of `appsettings.json` (at least the empty settings) into `appsettings.development.json`
 * Populate `appsettings.development.json`
+  * Example connection strings:
+    * local: `Server=.;Database=Jellypic;Integrated Security=SSPI;MultipleActiveResultSets=true`
+    * Azure: get from Azure Portal
 * Open Package Manager Console
 * Run database migrations by executing this command: `update-database`
 
