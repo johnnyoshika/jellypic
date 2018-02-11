@@ -16,17 +16,20 @@ using Jellypic.Web.Base;
 using Jellypic.Web.Events;
 using Jellypic.Web.Common;
 using System.IO;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Jellypic.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IHostingEnvironment env, IConfiguration configuration)
         {
+            Env = env;
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        IHostingEnvironment Env { get; }
+        IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -48,7 +51,12 @@ namespace Jellypic.Web
                      };
                 });
 
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                if (!Env.IsDevelopment())
+                    options.Filters.Add(new RequireHttpsAttribute());
+            });
+
             services.AddScoped<IUserContext, UserContext>();
             services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationWriter>();
