@@ -34,6 +34,8 @@ namespace Jellypic.Web
         {
             ConfigSettings.Current = new ConfigSettings(Configuration);
 
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(o =>
                 {
