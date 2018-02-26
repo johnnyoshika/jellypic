@@ -204,8 +204,8 @@ namespace Jellypic.Web.Models
                 CreatedAt = CreatedAt.ToEpoch(),
                 CloudinaryPublicId,
                 User = User.ToJson(),
-                Likes = Likes.Select(l => l.ToJson()),
-                Comments = Comments.Select(c => c.ToJson())
+                Likes = Likes.OrderBy(l => l.CreatedAt).Select(l => l.ToJson()),
+                Comments = Comments.OrderBy(c => c.CreatedAt).Select(c => c.ToJson())
             };
     }
 
