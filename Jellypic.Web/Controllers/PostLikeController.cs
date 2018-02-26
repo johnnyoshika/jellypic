@@ -48,7 +48,7 @@ namespace Jellypic.Web.Controllers
                 await NotificationCreator.CreateAsync(UserContext.UserId, post, NotificationType.Like);
 
             await DataContext.SaveChangesAsync();
-            return post.ToJson();
+            return (await ReadPostAsync(id)).ToJson();
         }
 
         [HttpDelete]

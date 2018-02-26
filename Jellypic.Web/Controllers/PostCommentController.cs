@@ -45,7 +45,7 @@ namespace Jellypic.Web.Controllers
                 await NotificationCreator.CreateAsync(UserContext.UserId, post, NotificationType.Comment);
 
             await DataContext.SaveChangesAsync();
-            return post.ToJson();
+            return (await ReadPostAsync(id)).ToJson();
         }
 
         [HttpDelete("{commentId}")]
