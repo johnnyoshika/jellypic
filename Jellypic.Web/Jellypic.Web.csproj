@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="CloudinaryDotNet" Version="1.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
-    <PackageReference Include="WebPush-NetCore" Version="1.0.2" />
+    <PackageReference Include="WebPush" Version="1.0.10" />
   </ItemGroup>
 
 </Project>
