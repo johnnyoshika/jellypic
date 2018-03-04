@@ -27,22 +27,21 @@ namespace Jellypic.Web.Controllers
         [HttpGet]
         public async Task<object> Get(int? after = null)
         {
-            int take = 20;
+            int take = 10;
 
-            bool hasMore = await DataContext.ReadPosts(p => !after.HasValue || p.Id > after)
-                .Skip(take)
-                .AnyAsync();
-
-            var posts = await DataContext.ReadPosts(p => !after.HasValue || p.Id > after)
-                .Take(take)
+            var posts = await DataContext.ReadPosts(p => !after.HasValue || p.Id < after)
+                .OrderByDescending(p => p.Id)
+                .Take(take + 1)
                 .ToListAsync();
+
+            bool hasMore = posts.Count() > take;
 
             return new
             {
-                Data = posts.Select(p => p.ToJson()),
+                Data = posts.Take(take).Select(p => p.ToJson()),
                 Pagination = new
                 {
-                    NextUrl = hasMore ? $"/api/posts?after={posts.Last().Id}" : null
+                    NextUrl = hasMore ? $"/api/posts?after={posts.Take(take).Last().Id}" : null
                 }
 
             };
