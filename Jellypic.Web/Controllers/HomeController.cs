@@ -17,5 +17,9 @@ namespace Jellypic.Web.Controllers
             File(Convert.FromBase64String(
                 "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII="),
                 "image/x-icon");
+
+        [HttpGet("privacy")]
+        public IActionResult Privacy() =>
+            View();
     }
 }

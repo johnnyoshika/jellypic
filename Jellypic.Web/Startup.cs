@@ -78,7 +78,7 @@ namespace Jellypic.Web
             app.Use(async (context, next) =>
             {
                 var path = context.Request.Path.Value;
-                if (!path.StartsWith("/api") && !Path.HasExtension(path))
+                if (!path.StartsWith("/api") && !path.StartsWith("/privacy") && !Path.HasExtension(path))
                     context.Request.Path = "/";
 
                 await next();
