@@ -70,6 +70,7 @@ namespace Jellypic.Web
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole();
+            app.UseMiddleware<NoCacheMiddleware>(new NoCacheOptions("/sw.js"));
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseAuthentication();
             app.UseMiddleware<AuthenticationMiddleware>();
