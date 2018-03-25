@@ -25,11 +25,26 @@ namespace Jellypic.Web.Controllers
         JellypicContext DataContext { get; set; }
 
         [HttpGet]
-        public async Task<object> Get(int? after = null)
-        {
-            int take = 10;
+        public async Task<object> Get(int? userId = null, int? after = null) =>
+            userId.HasValue
+                ? await GetForUser(userId.Value, after)
+                : await GetForAll(after);
 
-            var posts = await DataContext.ReadPosts(p => !after.HasValue || p.Id < after)
+        async Task<object> GetForAll(int? after) =>
+            await GetResult(p => !after.HasValue || p.Id < after, "/api/posts?after={0}");
+
+        async Task<object> GetForUser(int userId, int? after) =>
+            await GetResult(p => 
+                p.UserId == userId
+                &&
+                (!after.HasValue || p.Id < after)
+                , $"/api/posts?userId={userId}&after={{0}}");
+
+        async Task<object> GetResult(Expression<Func<Post, bool>> filter, string nextUrlFormat)
+        {
+            int take = 12;
+
+            var posts = await DataContext.ReadPosts(filter)
                 .OrderByDescending(p => p.Id)
                 .Take(take + 1)
                 .ToListAsync();
@@ -41,9 +56,8 @@ namespace Jellypic.Web.Controllers
                 Data = posts.Take(take).Select(p => p.ToJson()),
                 Pagination = new
                 {
-                    NextUrl = hasMore ? $"/api/posts?after={posts.Take(take).Last().Id}" : null
+                    NextUrl = hasMore ? string.Format(nextUrlFormat, posts.Take(take).Last().Id) : null
                 }
-
             };
         }
 
