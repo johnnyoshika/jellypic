@@ -32,7 +32,6 @@ namespace Jellypic.Web.Controllers
         public async Task<object> Get() =>
             (await DataContext
                 .Users
-                .Include(u => u.Posts)
                 .FirstAsync(u => u.Id == UserContext.UserId))
                 .ToJson();
 
