@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Jellypic.Web.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -156,7 +157,10 @@ namespace Jellypic.Web.Models
             get
             {
                 if (AuthType == "Facebook")
-                    return $"https://res.cloudinary.com/{ConfigSettings.Current.Cloudinary.CloudName}/image/facebook/c_fill,g_auto:faces,h_152,r_max,w_152/{AuthUserId}.png";
+                {
+                    var cloudinary = new CloudinaryUrlBuilder();
+                    return cloudinary.FacebookUser(AuthUserId, 152);
+                }
 
                 return null;
             }
@@ -167,7 +171,10 @@ namespace Jellypic.Web.Models
             get
             {
                 if (AuthType == "Facebook")
-                    return $"https://res.cloudinary.com/{ConfigSettings.Current.Cloudinary.CloudName}/image/facebook/c_fill,g_auto:faces,h_30,r_max,w_30/{AuthUserId}.png";
+                {
+                    var cloudinary = new CloudinaryUrlBuilder();
+                    return cloudinary.FacebookUser(AuthUserId, 30);
+                }
 
                 return null;
             }
