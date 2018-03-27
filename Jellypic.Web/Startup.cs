@@ -74,6 +74,7 @@ namespace Jellypic.Web
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseAuthentication();
             app.UseMiddleware<AuthenticationMiddleware>();
+            app.UseMiddleware<ActivityRecordingMiddleware>();
 
             app.UseStaticFiles();
             app.Use(async (context, next) =>
