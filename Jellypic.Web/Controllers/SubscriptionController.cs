@@ -31,7 +31,8 @@ namespace Jellypic.Web.Controllers
                 UserId = UserContext.UserId,
                 Endpoint = args.Endpoint,
                 P256DH = args.Keys.P256DH,
-                Auth = args.Keys.Auth
+                Auth = args.Keys.Auth,
+                CreatedAt = DateTime.UtcNow
             });
 
             await DataContext.SaveChangesAsync();
