@@ -23,6 +23,19 @@ namespace Jellypic.Web.Controllers
         IUserContext UserContext { get; }
         JellypicContext DataContext { get; }
 
+        [HttpGet]
+        public async Task<object> Get(string endpoint)
+        {
+            var subscription = await DataContext.Subscriptions.FirstOrDefaultAsync(s => s.Endpoint == endpoint);
+            if (subscription == null)
+                throw new NotFoundException("Subscription not found.");
+
+            if (subscription.UserId != UserContext.UserId)
+                throw new UnauthorizedAccessException();
+
+            return subscription.ToJson();
+        }
+
         [HttpPost]
         public async Task Post([FromBody] SubscriptionPostArgs args)
         {

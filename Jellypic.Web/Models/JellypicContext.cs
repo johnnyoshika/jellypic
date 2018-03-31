@@ -306,5 +306,13 @@ namespace Jellypic.Web.Models
         public string P256DH { get; set; }
         public string Auth { get; set; }
         public DateTime CreatedAt { get; set; }
+
+        public object ToJson() =>
+            new
+            {
+                Id,
+                CreatedAt,
+                Endpoint
+            };
     }
 }
