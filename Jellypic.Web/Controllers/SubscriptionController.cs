@@ -45,7 +45,8 @@ namespace Jellypic.Web.Controllers
                 Endpoint = args.Endpoint,
                 P256DH = args.Keys.P256DH,
                 Auth = args.Keys.Auth,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UserAgent = Request.Headers["User-Agent"].ToString()
             });
 
             await DataContext.SaveChangesAsync();
