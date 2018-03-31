@@ -11,9 +11,10 @@ using System;
 namespace Jellypic.Web.Migrations
 {
     [DbContext(typeof(JellypicContext))]
-    partial class JellypicContextModelSnapshot : ModelSnapshot
+    [Migration("20180331002732_Add_Subscription_UserAgent")]
+    partial class Add_Subscription_UserAgent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
