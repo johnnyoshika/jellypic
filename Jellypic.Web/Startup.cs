@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Jellypic.Web.Infrastructure;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -17,18 +16,19 @@ using Jellypic.Web.Events;
 using Jellypic.Web.Common;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 
 namespace Jellypic.Web
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env, IConfiguration configuration)
+        public Startup(IWebHostEnvironment env, IConfiguration configuration)
         {
             Env = env;
             Configuration = configuration;
         }
 
-        IHostingEnvironment Env { get; }
+        IWebHostEnvironment Env { get; }
         IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -36,6 +36,12 @@ namespace Jellypic.Web
         public void ConfigureServices(IServiceCollection services)
         {
             ConfigSettings.Current = new ConfigSettings(Configuration);
+
+            services.AddControllersWithViews(options =>
+            {
+                if (!Env.IsDevelopment())
+                    options.Filters.Add(new RequireHttpsAttribute());
+            });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -51,12 +57,6 @@ namespace Jellypic.Web
                      };
                 });
 
-            services.AddMvc(options =>
-            {
-                if (!Env.IsDevelopment())
-                    options.Filters.Add(new RequireHttpsAttribute());
-            });
-
             services.AddScoped<IUserContext, UserContext>();
             services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationWriter>();
@@ -67,15 +67,13 @@ namespace Jellypic.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            loggerFactory.AddConsole();
             app.UseMiddleware<NoCacheMiddleware>(new NoCacheOptions("/sw.js"));
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseAuthentication();
             app.UseMiddleware<AuthenticationMiddleware>();
             app.UseMiddleware<ActivityRecordingMiddleware>();
-
             app.UseStaticFiles();
             app.Use(async (context, next) =>
             {
@@ -85,7 +83,9 @@ namespace Jellypic.Web
 
                 await next();
             });
-            app.UseMvc();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
         }
     }
 }
