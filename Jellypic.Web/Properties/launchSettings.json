@@ -4,7 +4,7 @@
     "anonymousAuthentication": true,
     "iisExpress": {
       "applicationUrl": "http://localhost:56000",
-      "sslPort": 0
+      "sslPort": 44340
     }
   },
   "profiles": {
@@ -18,10 +18,10 @@
     "Jellypic.Web": {
       "commandName": "Project",
       "launchBrowser": true,
+      "applicationUrl": "https://localhost:44340;http://localhost:56000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "http://localhost:56000"
+      }
     }
   }
 }
