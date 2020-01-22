@@ -17,7 +17,10 @@ using Jellypic.Web.Common;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
+using GraphQL;
+using GraphQL.Server;
 using Jellypic.Web.Services;
+using Jellypic.Web.GraphQL;
 
 namespace Jellypic.Web
 {
@@ -66,6 +69,17 @@ namespace Jellypic.Web
             services.AddScoped<INotificationCreator, NotificationCreator>();
             services.AddScoped<IWebPushSender, WebPushSender>();
             services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]), ServiceLifetime.Transient);
+
+            services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
+            services.AddScoped<JellypicSchema>();
+            services
+                .AddGraphQL(options =>
+                {
+                    options.ExposeExceptions = Env.IsDevelopment(); // expose detailed exceptions in JSON response
+                })
+                .AddGraphTypes(ServiceLifetime.Scoped)
+                .AddUserContextBuilder(httpContext => httpContext.User)
+                .AddDataLoader();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,10 +91,11 @@ namespace Jellypic.Web
             app.UseMiddleware<AuthenticationMiddleware>();
             app.UseMiddleware<ActivityRecordingMiddleware>();
             app.UseStaticFiles();
+            app.UseGraphQL<JellypicSchema>();
             app.Use(async (context, next) =>
             {
                 var path = context.Request.Path.Value;
-                if (!path.StartsWith("/api") && !path.StartsWith("/privacy") && !Path.HasExtension(path))
+                if (!path.StartsWith("/api") && !path.StartsWith("/api") && !path.StartsWith("/privacy") && !Path.HasExtension(path))
                     context.Request.Path = "/";
 
                 await next();
