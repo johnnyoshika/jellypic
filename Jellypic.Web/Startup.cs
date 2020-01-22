@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using GraphQL;
 using GraphQL.Server;
+using GraphQL.Server.Ui.Playground;
 using Jellypic.Web.Services;
 using Jellypic.Web.GraphQL;
 
@@ -92,6 +93,10 @@ namespace Jellypic.Web
             app.UseMiddleware<ActivityRecordingMiddleware>();
             app.UseStaticFiles();
             app.UseGraphQL<JellypicSchema>();
+
+            if (env.IsDevelopment())
+                app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
+
             app.Use(async (context, next) =>
             {
                 var path = context.Request.Path.Value;
