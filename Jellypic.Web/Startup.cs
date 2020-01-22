@@ -22,6 +22,7 @@ using GraphQL.Server;
 using GraphQL.Server.Ui.Playground;
 using Jellypic.Web.Services;
 using Jellypic.Web.GraphQL;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace Jellypic.Web
 {
@@ -81,6 +82,17 @@ namespace Jellypic.Web
                 .AddGraphTypes(ServiceLifetime.Scoped)
                 .AddUserContextBuilder(httpContext => httpContext.User)
                 .AddDataLoader();
+
+            // Temporarily allow synchronous IO, as it's required to overcome a bug in GraphQL.Net in .Net Core 3:
+            // https://github.com/graphql-dotnet/graphql-dotnet/issues/1161#issuecomment-540197786
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
