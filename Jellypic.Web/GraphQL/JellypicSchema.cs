@@ -12,6 +12,7 @@ namespace Jellypic.Web.GraphQL
         public JellypicSchema(IDependencyResolver resolver) : base(resolver)
         {
             Query = resolver.Resolve<JellypicQuery>();
+            Mutation = resolver.Resolve<JellypicMutation>();
         }
     }
 }
