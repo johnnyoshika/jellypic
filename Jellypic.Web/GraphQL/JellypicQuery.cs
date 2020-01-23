@@ -2,6 +2,7 @@
 using GraphQL.Server.Authorization.AspNetCore;
 using GraphQL.Types;
 using Jellypic.Web.GraphQL.Types;
+using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,7 +14,7 @@ namespace Jellypic.Web.GraphQL
 {
     public class JellypicQuery : ObjectGraphType
     {
-        public JellypicQuery(JellypicContext dataContext)
+        public JellypicQuery(JellypicContext dataContext, IUserContext userContext)
         {
             Field<UserType>(
                 "user",
@@ -21,13 +22,16 @@ namespace Jellypic.Web.GraphQL
                     new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" }),
                 resolve: context =>
                 {
-                    int id = context.GetArgument<int>("id");
-                    if (id < 1)
-                        context.Errors.Add(new ExecutionError("'id' out of range."));
+                    var id = context.GetArgument<object>("id");
+                    if (id.ToString() == "me")
+                        id = userContext.UserId;
+
+                    if (!int.TryParse(id.ToString(), out int result))
+                        context.Errors.Add(new ExecutionError("Invalid 'id'."));
 
                     return dataContext
                         .Users
-                        .FirstOrDefaultAsync(u => u.Id == id);
+                        .FirstOrDefaultAsync(u => u.Id == result);
                 })
                 .AuthorizeWith("LoggedIn");
         }
