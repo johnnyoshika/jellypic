@@ -17,6 +17,7 @@ using Jellypic.Web.Common;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
+using Jellypic.Web.Services;
 
 namespace Jellypic.Web
 {
@@ -58,6 +59,7 @@ namespace Jellypic.Web
                 });
 
             services.AddScoped<IUserContext, UserContext>();
+            services.AddScoped<IUserLogin, UserLogin>();
             services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationWriter>();
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationSender>();
