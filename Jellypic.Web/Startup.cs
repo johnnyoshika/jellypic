@@ -18,7 +18,9 @@ using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using GraphQL;
+using GraphQL.Validation;
 using GraphQL.Server;
+using GraphQL.Server.Authorization.AspNetCore;
 using GraphQL.Server.Ui.Playground;
 using Jellypic.Web.Services;
 using Jellypic.Web.GraphQL;
@@ -82,6 +84,12 @@ namespace Jellypic.Web
                 .AddGraphTypes(ServiceLifetime.Scoped)
                 .AddUserContextBuilder(httpContext => httpContext.User)
                 .AddDataLoader();
+            services
+                .AddTransient<IValidationRule, AuthorizationValidationRule>()
+                .AddAuthorization(options =>
+                {
+                    options.AddPolicy("LoggedIn", p => p.RequireAuthenticatedUser());
+                });
 
             // Temporarily allow synchronous IO, as it's required to overcome a bug in GraphQL.Net in .Net Core 3:
             // https://github.com/graphql-dotnet/graphql-dotnet/issues/1161#issuecomment-540197786

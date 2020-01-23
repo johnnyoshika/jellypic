@@ -1,4 +1,5 @@
 ﻿using GraphQL;
+using GraphQL.Server.Authorization.AspNetCore;
 using GraphQL.Types;
 using Jellypic.Web.GraphQL.Types;
 using Jellypic.Web.Models;
@@ -17,10 +18,7 @@ namespace Jellypic.Web.GraphQL
             Field<UserType>(
                 "user",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IdGraphType>>
-                    {
-                        Name = "id"
-                    }),
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" }),
                 resolve: context =>
                 {
                     int id = context.GetArgument<int>("id");
@@ -30,7 +28,8 @@ namespace Jellypic.Web.GraphQL
                     return dataContext
                         .Users
                         .FirstOrDefaultAsync(u => u.Id == id);
-                });
+                })
+                .AuthorizeWith("LoggedIn");
         }
     }
 }
