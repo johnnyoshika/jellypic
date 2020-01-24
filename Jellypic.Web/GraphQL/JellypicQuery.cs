@@ -16,6 +16,8 @@ namespace Jellypic.Web.GraphQL
     {
         public JellypicQuery(JellypicContext dataContext, IUserContext userContext)
         {
+            this.AuthorizeWith("LoggedIn");
+
             Field<UserType>(
                 "user",
                 arguments: new QueryArguments(
@@ -32,8 +34,7 @@ namespace Jellypic.Web.GraphQL
                     return dataContext
                         .Users
                         .FirstOrDefaultAsync(u => u.Id == result);
-                })
-                .AuthorizeWith("LoggedIn");
+                });
         }
     }
 }
