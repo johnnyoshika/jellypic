@@ -35,6 +35,22 @@ namespace Jellypic.Web.GraphQL
                         .Users
                         .FirstOrDefaultAsync(u => u.Id == result);
                 });
+
+            FieldAsync<ProfileType>(
+                "profile",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" }),
+                resolve: async context =>
+                {
+                    var id = context.GetArgument<int>("id");
+                    return new Profile
+                    {
+                        Id = id,
+                        PostCount = await dataContext.Posts.CountAsync(p => p.UserId == id),
+                        LikeCount = await dataContext.Likes.CountAsync(l => l.UserId == id),
+                        CommentCount = await dataContext.Comments.CountAsync(c => c.UserId == id)
+                    };
+                });
         }
     }
 }
