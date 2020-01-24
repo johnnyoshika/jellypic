@@ -51,6 +51,16 @@ namespace Jellypic.Web.GraphQL
                         CommentCount = await dataContext.Comments.CountAsync(c => c.UserId == id)
                     };
                 });
+
+            Field<PostType>(
+                "post",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" }),
+                resolve: context =>
+                {
+                    var id = context.GetArgument<int>("id");
+                    return dataContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
+                });
         }
     }
 }
