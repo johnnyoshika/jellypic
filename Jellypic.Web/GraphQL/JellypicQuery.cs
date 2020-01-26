@@ -16,8 +16,6 @@ namespace Jellypic.Web.GraphQL
     {
         public JellypicQuery(JellypicContext dataContext, IUserContext userContext)
         {
-            this.AuthorizeWith("LoggedIn");
-
             Field<UserType>(
                 "user",
                 arguments: new QueryArguments(
@@ -34,7 +32,7 @@ namespace Jellypic.Web.GraphQL
                     return dataContext
                         .Users
                         .FirstOrDefaultAsync(u => u.Id == result);
-                });
+                }).AuthorizeWith("LoggedIn");
 
             FieldAsync<ProfileType>(
                 "profile",
@@ -50,7 +48,7 @@ namespace Jellypic.Web.GraphQL
                         LikeCount = await dataContext.Likes.CountAsync(l => l.UserId == id),
                         CommentCount = await dataContext.Comments.CountAsync(c => c.UserId == id)
                     };
-                });
+                }).AuthorizeWith("LoggedIn");
 
             Field<PostType>(
                 "post",
@@ -60,7 +58,7 @@ namespace Jellypic.Web.GraphQL
                 {
                     var id = context.GetArgument<int>("id");
                     return dataContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
-                });
+                }).AuthorizeWith("LoggedIn");
         }
     }
 }
