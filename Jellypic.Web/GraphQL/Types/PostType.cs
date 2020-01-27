@@ -10,7 +10,7 @@ namespace Jellypic.Web.GraphQL.Types
 {
     public class PostType : ObjectGraphType<Post>
     {
-        public PostType(JellypicContext dataContext)
+        public PostType(Func<JellypicContext> dataContext)
         {
             Name = "Post";
 
@@ -18,27 +18,39 @@ namespace Jellypic.Web.GraphQL.Types
             Field(t => t.CreatedAt, type: typeof(DateTimeGraphType));
             Field(t => t.CloudinaryPublicId);
 
-            Field<NonNullGraphType<UserType>>(
+            FieldAsync<NonNullGraphType<UserType>>(
                 "user",
-                resolve: context => dataContext
-                    .Users
-                    .FirstAsync(u => u.Id == context.Source.UserId));
+                resolve: async context =>
+                {
+                    using (var dc = dataContext())
+                        return await dc
+                            .Users
+                            .FirstAsync(u => u.Id == context.Source.UserId);
+                });
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<LikeType>>>>(
+            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<LikeType>>>>(
                 "likes",
-                resolve: context => dataContext
-                    .Likes
-                    .Where(l => l.PostId == context.Source.Id)
-                    .OrderBy(l => l.CreatedAt)
-                    .ToListAsync());
+                resolve: async context =>
+                {
+                    using (var dc = dataContext())
+                        return await dc
+                            .Likes
+                            .Where(l => l.PostId == context.Source.Id)
+                            .OrderBy(l => l.CreatedAt)
+                            .ToListAsync();
+                });
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<CommentType>>>>(
+            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<CommentType>>>>(
                 "comments",
-                resolve: context => dataContext
-                    .Comments
-                    .Where(c => c.PostId == context.Source.Id)
-                    .OrderBy(c => c.CreatedAt)
-                    .ToListAsync());
+                resolve: async context =>
+                {
+                    using (var dc = dataContext())
+                        return await dc
+                            .Comments
+                            .Where(c => c.PostId == context.Source.Id)
+                            .OrderBy(c => c.CreatedAt)
+                            .ToListAsync();
+                });
         }
     }
 }

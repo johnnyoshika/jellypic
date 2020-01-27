@@ -73,6 +73,7 @@ namespace Jellypic.Web
             services.AddScoped<INotificationCreator, NotificationCreator>();
             services.AddScoped<IWebPushSender, WebPushSender>();
             services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]), ServiceLifetime.Transient);
+            services.AddTransient<Func<JellypicContext>>(options => () => options.GetService<JellypicContext>());
 
             services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
             services.AddScoped<JellypicSchema>();
