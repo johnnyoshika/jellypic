@@ -1,4 +1,5 @@
-﻿using GraphQL.Types;
+﻿using GraphQL.DataLoader;
+using GraphQL.Types;
 using Jellypic.Web.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,7 +11,7 @@ namespace Jellypic.Web.GraphQL.Types
 {
     public class LikeType : ObjectGraphType<Like>
     {
-        public LikeType(JellypicContext dataContext)
+        public LikeType(IBatchLoader batchLoader, IDataLoaderContextAccessor accessor)
         {
             Name = "Like";
 
@@ -19,9 +20,11 @@ namespace Jellypic.Web.GraphQL.Types
 
             Field<NonNullGraphType<UserType>>(
                 "user",
-                resolve: context => dataContext
-                        .Users
-                        .FirstAsync(u => u.Id == context.Source.UserId));
+                resolve: context =>
+                {
+                    var loader = accessor.Context.GetOrAddBatchLoader<int, User>("GetUsersByIdsAsync", batchLoader.GetUsersByIdsAsync);
+                    return loader.LoadAsync(context.Source.UserId);
+                });
         }
     }
 }

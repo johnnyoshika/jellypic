@@ -17,7 +17,8 @@ namespace Jellypic.Web.GraphQL
             using (var dc = dataContext())
             {
                 var posts = await dc
-                    .ReadPosts(filter)
+                    .Posts
+                    .Where(filter)
                     .OrderByDescending(p => p.Id)
                     .Take(take + 1)
                     .ToListAsync();

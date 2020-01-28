@@ -1,4 +1,5 @@
-﻿using GraphQL.Types;
+﻿using GraphQL.DataLoader;
+using GraphQL.Types;
 using Jellypic.Web.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,7 +11,7 @@ namespace Jellypic.Web.GraphQL.Types
 {
     public class PostType : ObjectGraphType<Post>
     {
-        public PostType(Func<JellypicContext> dataContext)
+        public PostType(IBatchLoader batchLoader, IDataLoaderContextAccessor accessor)
         {
             Name = "Post";
 
@@ -18,38 +19,28 @@ namespace Jellypic.Web.GraphQL.Types
             Field(t => t.CreatedAt, type: typeof(DateTimeGraphType));
             Field(t => t.CloudinaryPublicId);
 
-            FieldAsync<NonNullGraphType<UserType>>(
+            Field<NonNullGraphType<UserType>>(
                 "user",
-                resolve: async context =>
+                resolve: context =>
                 {
-                    using (var dc = dataContext())
-                        return await dc
-                            .Users
-                            .FirstAsync(u => u.Id == context.Source.UserId);
+                    var loader = accessor.Context.GetOrAddBatchLoader<int, User>("GetUsersByIdsAsync", batchLoader.GetUsersByIdsAsync);
+                    return loader.LoadAsync(context.Source.UserId);
                 });
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<LikeType>>>>(
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<LikeType>>>>(
                 "likes",
-                resolve: async context =>
+                resolve: context =>
                 {
-                    using (var dc = dataContext())
-                        return await dc
-                            .Likes
-                            .Where(l => l.PostId == context.Source.Id)
-                            .OrderBy(l => l.CreatedAt)
-                            .ToListAsync();
+                    var loader = accessor.Context.GetOrAddCollectionBatchLoader<int, Like>("GetLikesByPostIdsAsync", batchLoader.GetLikesByPostIdsAsync);
+                    return loader.LoadAsync(context.Source.Id);
                 });
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<CommentType>>>>(
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<CommentType>>>>(
                 "comments",
-                resolve: async context =>
+                resolve: context =>
                 {
-                    using (var dc = dataContext())
-                        return await dc
-                            .Comments
-                            .Where(c => c.PostId == context.Source.Id)
-                            .OrderBy(c => c.CreatedAt)
-                            .ToListAsync();
+                    var loader = accessor.Context.GetOrAddCollectionBatchLoader<int, Comment>("GetCommentsByPostIdsAsync", batchLoader.GetCommentsByPostIdsAsync);
+                    return loader.LoadAsync(context.Source.Id);
                 });
         }
     }
