@@ -72,27 +72,8 @@ namespace Jellypic.Web.GraphQL
                     new QueryArgument<IntGraphType> { Name = "after" }),
                 resolve: async context =>
                 {
-                    int take = 12;
                     int? after = context.GetArgument<int?>("after");
-
-                    using (var dc = dataContext())
-                    {
-                        var posts = await dc
-                            .ReadPosts(p => !after.HasValue || p.Id < after)
-                            .OrderByDescending(p => p.Id)
-                            .Take(take + 1)
-                            .ToListAsync();
-
-                        return new PostConnection
-                        {
-                            Nodes = posts.Take(take).ToList(),
-                            Page = new PageInfo
-                            {
-                                EndCursor = posts.Take(take).LastOrDefault()?.Id,
-                                HasNextPage = posts.Count() > take
-                            }
-                        };
-                    }
+                    return await dataContext.PostConnectionsAsync(p => !after.HasValue || p.Id < after);
                 }).AuthorizeWith("LoggedIn");
         }
     }
