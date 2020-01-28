@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Jellypic.Web.GraphQL
@@ -63,6 +64,35 @@ namespace Jellypic.Web.GraphQL
                     
                     using (var dc = dataContext())
                         return await dc.Posts.FirstOrDefaultAsync(p => p.Id == id);
+                }).AuthorizeWith("LoggedIn");
+
+            FieldAsync<NonNullGraphType<PostConnectionType>>(
+                "posts",
+                arguments: new QueryArguments(
+                    new QueryArgument<IntGraphType> { Name = "after" }),
+                resolve: async context =>
+                {
+                    int take = 12;
+                    int? after = context.GetArgument<int?>("after");
+
+                    using (var dc = dataContext())
+                    {
+                        var posts = await dc
+                            .ReadPosts(p => !after.HasValue || p.Id < after)
+                            .OrderByDescending(p => p.Id)
+                            .Take(take + 1)
+                            .ToListAsync();
+
+                        return new PostConnection
+                        {
+                            Nodes = posts.Take(take).ToList(),
+                            Page = new PageInfo
+                            {
+                                EndCursor = posts.Take(take).LastOrDefault()?.Id,
+                                HasNextPage = posts.Count() > take
+                            }
+                        };
+                    }
                 }).AuthorizeWith("LoggedIn");
         }
     }
