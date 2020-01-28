@@ -11,7 +11,7 @@ namespace Jellypic.Web.GraphQL.Types
 {
     public class PostType : ObjectGraphType<Post>
     {
-        public PostType(Func<JellypicContext> dataContext, IBatchLoader batchLoader, IDataLoaderContextAccessor accessor)
+        public PostType(IBatchLoader batchLoader, IDataLoaderContextAccessor accessor)
         {
             Name = "Post";
 
@@ -27,28 +27,20 @@ namespace Jellypic.Web.GraphQL.Types
                     return loader.LoadAsync(context.Source.UserId);
                 });
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<LikeType>>>>(
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<LikeType>>>>(
                 "likes",
-                resolve: async context =>
+                resolve: context =>
                 {
-                    using (var dc = dataContext())
-                        return await dc
-                            .Likes
-                            .Where(l => l.PostId == context.Source.Id)
-                            .OrderBy(l => l.CreatedAt)
-                            .ToListAsync();
+                    var loader = accessor.Context.GetOrAddCollectionBatchLoader<int, Like>("GetLikesByPostIdsAsync", batchLoader.GetLikesByPostIdsAsync);
+                    return loader.LoadAsync(context.Source.Id);
                 });
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<CommentType>>>>(
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<CommentType>>>>(
                 "comments",
-                resolve: async context =>
+                resolve: context =>
                 {
-                    using (var dc = dataContext())
-                        return await dc
-                            .Comments
-                            .Where(c => c.PostId == context.Source.Id)
-                            .OrderBy(c => c.CreatedAt)
-                            .ToListAsync();
+                    var loader = accessor.Context.GetOrAddCollectionBatchLoader<int, Comment>("GetCommentsByPostIdsAsync", batchLoader.GetCommentsByPostIdsAsync);
+                    return loader.LoadAsync(context.Source.Id);
                 });
         }
     }

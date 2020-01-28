@@ -27,5 +27,31 @@ namespace Jellypic.Web.GraphQL
                     .ToDictionary(u => u.Id);
             }
         }
+
+        public async Task<ILookup<int, Like>> GetLikesByPostIdsAsync(IEnumerable<int> postIds)
+        {
+            using (var context = Context())
+            {
+                return (await context
+                    .Likes
+                    .Where(l => postIds.Contains(l.PostId))
+                    .OrderBy(l => l.Id)
+                    .ToListAsync())
+                    .ToLookup(l => l.PostId);
+            }
+        }
+
+        public async Task<ILookup<int, Comment>> GetCommentsByPostIdsAsync(IEnumerable<int> postIds)
+        {
+            using (var context = Context())
+            {
+                return (await context
+                    .Comments
+                    .Where(c => postIds.Contains(c.PostId))
+                    .OrderBy(c => c.Id)
+                    .ToListAsync())
+                    .ToLookup(c => c.PostId);
+            }
+        }
     }
 }
