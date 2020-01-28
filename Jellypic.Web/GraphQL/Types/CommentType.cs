@@ -1,4 +1,5 @@
-﻿using GraphQL.Types;
+﻿using GraphQL.DataLoader;
+using GraphQL.Types;
 using Jellypic.Web.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,19 +11,21 @@ namespace Jellypic.Web.GraphQL.Types
 {
     public class CommentType : ObjectGraphType<Comment>
     {
-        public CommentType(JellypicContext dataContext)
+        public CommentType(IBatchLoader batchLoader, IDataLoaderContextAccessor accessor)
         {
             Name = "Comment";
 
             Field(t => t.Id);
             Field(t => t.CreatedAt, type: typeof(DateTimeGraphType));
             Field(t => t.Text);
-            
+
             Field<NonNullGraphType<UserType>>(
                 "user",
-                resolve: context => dataContext
-                        .Users
-                        .FirstAsync(u => u.Id == context.Source.UserId));
+                resolve: context =>
+                {
+                    var loader = accessor.Context.GetOrAddBatchLoader<int, User>("GetUsersByIdsAsync", batchLoader.GetUsersByIdsAsync);
+                    return loader.LoadAsync(context.Source.UserId);
+                });
         }
     }
 }
