@@ -13,8 +13,10 @@ namespace Jellypic.Web.Models
             context
                 .Posts
                 .Include(p => p.User)
-                .Include("Likes.User")
-                .Include("Comments.User")
+                .Include(p => p.Likes)
+                    .ThenInclude(l => l.User)
+                .Include(p => p.Comments)
+                    .ThenInclude(c => c.User)
                 .Where(filter)
                 .OrderByDescending(p => p.Id);
     }
