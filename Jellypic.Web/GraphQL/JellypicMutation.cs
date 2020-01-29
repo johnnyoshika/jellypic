@@ -111,6 +111,39 @@ namespace Jellypic.Web.GraphQL
                         return new RemovePayload { Success = true };
                     }
                 });
+
+            FieldAsync<CommentType>(
+                "addComment",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<AddCommentInputType>> { Name = "input" }),
+                resolve: async context =>
+                {
+                    var input = context.GetArgument<AddCommentInput>("input");
+
+                    using (var dc = dataContext())
+                    {
+                        var post = await dc.Posts.Where(p => p.Id == input.PostId).FirstOrDefaultAsync();
+                        if (post == null)
+                            throw new ExecutionError($"postId '{input.PostId}' not found.");
+
+                        var comment = new Comment
+                        {
+                            PostId = post.Id,
+                            UserId = userContext.UserId,
+                            Text = input.Text,
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+                        dc.Comments.Add(comment);
+
+                        await dc.SaveChangesAsync();
+
+                        if (userContext.UserId != post.UserId)
+                            await notificationCreator.CreateAsync(userContext.UserId, post, NotificationType.Comment);
+
+                        return comment;
+                    }
+                });
         }
     }
 }
