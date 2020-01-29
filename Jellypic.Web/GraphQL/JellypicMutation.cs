@@ -2,6 +2,7 @@
 using GraphQL.Types;
 using Jellypic.Web.Common;
 using Jellypic.Web.GraphQL.Inputs;
+using Jellypic.Web.GraphQL.Payloads;
 using Jellypic.Web.GraphQL.Types;
 using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
@@ -51,7 +52,7 @@ namespace Jellypic.Web.GraphQL
                     }
                 });
 
-            FieldAsync<LikeType>(
+            FieldAsync<AddLikePayloadType>(
                 "addLike",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<AddLikeInputType>> { Name = "input" }),
@@ -67,7 +68,7 @@ namespace Jellypic.Web.GraphQL
 
                         var like = await dc.Likes.FirstOrDefaultAsync(l => l.UserId == userContext.UserId && l.PostId == post.Id);
                         if (like != null)
-                            return like;
+                            return new AddLikePayload { Subject = like };
 
                         like = new Like
                         {
@@ -82,11 +83,11 @@ namespace Jellypic.Web.GraphQL
                         if (userContext.UserId != post.UserId)
                             await notificationCreator.CreateAsync(userContext.UserId, post, NotificationType.Like);
 
-                        return like;
+                        return new AddLikePayload { Subject = like };
                     }
                 });
 
-            FieldAsync<RemovePayloadType>(
+            FieldAsync<RemoveLikePayloadType>(
                 "removeLike",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<RemoveLikeInputType>> { Name = "input" }),
@@ -102,17 +103,17 @@ namespace Jellypic.Web.GraphQL
 
                         var like = await dc.Likes.FirstOrDefaultAsync(l => l.UserId == userContext.UserId && l.PostId == post.Id);
                         if (like == null)
-                            return new RemovePayload { Success = false };
+                            return new RemoveLikePayload { AffectedRows = 0, PostId = post.Id };
 
                         dc.Likes.Remove(like);
 
                         await dc.SaveChangesAsync();
 
-                        return new RemovePayload { Success = true };
+                        return new RemoveLikePayload { AffectedRows = 1, PostId = post.Id };
                     }
                 });
 
-            FieldAsync<CommentType>(
+            FieldAsync<AddCommentPayloadType>(
                 "addComment",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<AddCommentInputType>> { Name = "input" }),
@@ -141,11 +142,11 @@ namespace Jellypic.Web.GraphQL
                         if (userContext.UserId != post.UserId)
                             await notificationCreator.CreateAsync(userContext.UserId, post, NotificationType.Comment);
 
-                        return comment;
+                        return new AddCommentPayload { Subject = comment };
                     }
                 });
 
-            FieldAsync<RemovePayloadType>(
+            FieldAsync<RemoveCommentPayloadType>(
                 "removeComment",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<RemoveCommentInputType>> { Name = "input" }),
@@ -157,11 +158,11 @@ namespace Jellypic.Web.GraphQL
                     {
                         var comment = await dc.Comments.FirstOrDefaultAsync(c => c.UserId == userContext.UserId && c.Id == input.Id);
                         if (comment == null)
-                            return new RemovePayload { Success = false };
+                            return new RemoveCommentPayload { AffectedRows = 0 };
 
                         dc.Comments.Remove(comment);
                         await dc.SaveChangesAsync();
-                        return new RemovePayload { Success = true };
+                        return new RemoveCommentPayload { AffectedRows = 1, PostId = comment.PostId };
                     }
                 });
         }
