@@ -1,9 +1,12 @@
-﻿using GraphQL.Types;
+﻿using GraphQL;
+using GraphQL.Types;
+using Jellypic.Web.Common;
 using Jellypic.Web.GraphQL.Inputs;
 using Jellypic.Web.GraphQL.Types;
 using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
 using Jellypic.Web.Services;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +16,7 @@ namespace Jellypic.Web.GraphQL
 {
     public class JellypicMutation : ObjectGraphType
     {
-        public JellypicMutation(IUserLogin userLogin, IUserContext userContext, Func<JellypicContext> dataContext)
+        public JellypicMutation(IUserLogin userLogin, IUserContext userContext, Func<JellypicContext> dataContext, INotificationCreator notificationCreator)
         {
             FieldAsync<UserType>(
                 "login",
@@ -45,6 +48,41 @@ namespace Jellypic.Web.GraphQL
                         await dc.SaveChangesAsync();
 
                         return posts;
+                    }
+                });
+
+            FieldAsync<LikeType>(
+                "addLike",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<AddLikeInputType>> { Name = "input" }),
+                resolve: async context =>
+                {
+                    var input = context.GetArgument<AddLikeInput>("input");
+
+                    using (var dc = dataContext())
+                    {
+                        var post = await dc.Posts.Where(p => p.Id == input.PostId).FirstOrDefaultAsync();
+                        if (post == null)
+                            throw new ExecutionError($"postId '{input.PostId}' not found.");
+
+                        var like = await dc.Likes.FirstOrDefaultAsync(l => l.UserId == userContext.UserId && l.PostId == post.Id);
+                        if (like != null)
+                            return like;
+
+                        like = new Like
+                        {
+                            PostId = post.Id,
+                            UserId = userContext.UserId,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        dc.Likes.Add(like);
+
+                        await dc.SaveChangesAsync();
+
+                        if (userContext.UserId != post.UserId)
+                            await notificationCreator.CreateAsync(userContext.UserId, post, NotificationType.Like);
+
+                        return like;
                     }
                 });
         }
