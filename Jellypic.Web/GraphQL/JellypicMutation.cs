@@ -29,7 +29,7 @@ namespace Jellypic.Web.GraphQL
                     return await userLogin.LogInAsync(accessToken);
                 });
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<PostType>>>>(
+            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<CreatePostPayloadType>>>>(
                 "createPost",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<ListGraphType<NonNullGraphType<CreatePostInputType>>>> { Name = "inputs" }),
@@ -48,7 +48,7 @@ namespace Jellypic.Web.GraphQL
                         dc.Posts.AddRange(posts);
                         await dc.SaveChangesAsync();
 
-                        return posts;
+                        return posts.Select(p => new CreatePostPayload { Subject = p }).ToList();
                     }
                 });
 
