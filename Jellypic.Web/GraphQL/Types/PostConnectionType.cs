@@ -19,7 +19,7 @@ namespace Jellypic.Web.GraphQL.Types
 
             Field<NonNullGraphType<PageInfoType>>(
                 "pageInfo",
-                resolve: context => context.Source.Page);
+                resolve: context => context.Source.PageInfo);
         }
     }
 }

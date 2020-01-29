@@ -26,7 +26,7 @@ namespace Jellypic.Web.GraphQL
                 return new PostConnection
                 {
                     Nodes = posts.Take(take).ToList(),
-                    Page = new PageInfo
+                    PageInfo = new PageInfo
                     {
                         EndCursor = posts.Take(take).LastOrDefault()?.Id,
                         HasNextPage = posts.Count() > take
