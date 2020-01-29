@@ -144,6 +144,26 @@ namespace Jellypic.Web.GraphQL
                         return comment;
                     }
                 });
+
+            FieldAsync<RemovePayloadType>(
+                "removeComment",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<RemoveCommentInputType>> { Name = "input" }),
+                resolve: async context =>
+                {
+                    var input = context.GetArgument<RemoveCommentInput>("input");
+
+                    using (var dc = dataContext())
+                    {
+                        var comment = await dc.Comments.FirstOrDefaultAsync(c => c.UserId == userContext.UserId && c.Id == input.Id);
+                        if (comment == null)
+                            return new RemovePayload { Success = false };
+
+                        dc.Comments.Remove(comment);
+                        await dc.SaveChangesAsync();
+                        return new RemovePayload { Success = true };
+                    }
+                });
         }
     }
 }
