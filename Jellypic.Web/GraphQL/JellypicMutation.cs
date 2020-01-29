@@ -19,14 +19,17 @@ namespace Jellypic.Web.GraphQL
     {
         public JellypicMutation(IUserLogin userLogin, IUserContext userContext, Func<JellypicContext> dataContext, INotificationCreator notificationCreator)
         {
-            FieldAsync<UserType>(
+            FieldAsync<LoginPayloadType>(
                 "login",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "accessToken" }),
+                    new QueryArgument<NonNullGraphType<LoginInputType>> { Name = "input" }),
                 resolve: async context =>
                 {
-                    string accessToken = context.GetArgument<string>("accessToken");
-                    return await userLogin.LogInAsync(accessToken);
+                    var input = context.GetArgument<LoginInput>("input");
+                    return new LoginPayload
+                    {
+                        Me = await userLogin.LogInAsync(input.AccessToken)
+                    };
                 });
 
             FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<CreatePostPayloadType>>>>(
