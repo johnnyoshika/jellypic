@@ -85,6 +85,32 @@ namespace Jellypic.Web.GraphQL
                         return like;
                     }
                 });
+
+            FieldAsync<RemovePayloadType>(
+                "removeLike",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<RemoveLikeInputType>> { Name = "input" }),
+                resolve: async context =>
+                {
+                    var input = context.GetArgument<RemoveLikeInput>("input");
+
+                    using (var dc = dataContext())
+                    {
+                        var post = await dc.Posts.Where(p => p.Id == input.PostId).FirstOrDefaultAsync();
+                        if (post == null)
+                            throw new ExecutionError($"postId '{input.PostId}' not found.");
+
+                        var like = await dc.Likes.FirstOrDefaultAsync(l => l.UserId == userContext.UserId && l.PostId == post.Id);
+                        if (like == null)
+                            return new RemovePayload { Success = false };
+
+                        dc.Likes.Remove(like);
+
+                        await dc.SaveChangesAsync();
+
+                        return new RemovePayload { Success = true };
+                    }
+                });
         }
     }
 }
