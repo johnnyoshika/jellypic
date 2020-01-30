@@ -34,5 +34,30 @@ namespace Jellypic.Web.GraphQL
                 };
             }
         }
+
+        public static async Task<NotificationConnection> NotificationConnectionAsync(this Func<JellypicContext> dataContext, Expression<Func<Notification, bool>> filter)
+        {
+            int take = 12;
+
+            using (var dc = dataContext())
+            {
+                var notifications = await dc
+                    .Notifications
+                    .Where(filter)
+                    .OrderByDescending(p => p.Id)
+                    .Take(take + 1)
+                    .ToListAsync();
+
+                return new NotificationConnection
+                {
+                    Nodes = notifications.Take(take).ToList(),
+                    PageInfo = new PageInfo
+                    {
+                        EndCursor = notifications.Take(take).LastOrDefault()?.Id,
+                        HasNextPage = notifications.Count() > take
+                    }
+                };
+            }
+        }
     }
 }

@@ -85,7 +85,7 @@ namespace Jellypic.Web.GraphQL
                         await dc.SaveChangesAsync();
 
                         if (userContext.UserId != post.UserId)
-                            await notificationCreator.CreateAsync(userContext.UserId, post, NotificationType.Like);
+                            await notificationCreator.CreateAsync(userContext.UserId, post, Models.NotificationType.Like);
 
                         return new AddLikePayload { Subject = like };
                     }
@@ -144,7 +144,7 @@ namespace Jellypic.Web.GraphQL
                         await dc.SaveChangesAsync();
 
                         if (userContext.UserId != post.UserId)
-                            await notificationCreator.CreateAsync(userContext.UserId, post, NotificationType.Comment);
+                            await notificationCreator.CreateAsync(userContext.UserId, post, Models.NotificationType.Comment);
 
                         return new AddCommentPayload { Subject = comment };
                     }

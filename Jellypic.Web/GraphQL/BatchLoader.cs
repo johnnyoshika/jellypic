@@ -28,6 +28,18 @@ namespace Jellypic.Web.GraphQL
             }
         }
 
+        public async Task<IDictionary<int, Post>> GetPostsByIdsAsync(IEnumerable<int> ids)
+        {
+            using (var context = Context())
+            {
+                return (await context
+                    .Posts
+                    .Where(p => ids.Contains(p.Id))
+                    .ToListAsync())
+                    .ToDictionary(p => p.Id);
+            }
+        }
+
         public async Task<ILookup<int, Like>> GetLikesByPostIdsAsync(IEnumerable<int> postIds)
         {
             using (var context = Context())

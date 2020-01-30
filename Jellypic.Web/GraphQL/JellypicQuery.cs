@@ -96,6 +96,16 @@ namespace Jellypic.Web.GraphQL
                         return subscription;
                     }
                 });
+
+            FieldAsync<NonNullGraphType<NotificationConnectionType>>(
+                "notifications",
+                arguments: new QueryArguments(
+                    new QueryArgument<IntGraphType> { Name = "after" }),
+                resolve: async context =>
+                {
+                    int? after = context.GetArgument<int?>("after");
+                    return await dataContext.NotificationConnectionAsync(n => !after.HasValue || n.Id < after);
+                }).AuthorizeWith("LoggedIn");
         }
     }
 }

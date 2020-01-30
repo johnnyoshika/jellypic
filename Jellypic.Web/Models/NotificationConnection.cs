@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 
 namespace Jellypic.Web.Models
 {
-    public abstract class Connection<T>
+    public class NotificationConnection : Connection<Notification>
     {
-        public List<T> Nodes { get; set; }
-        public PageInfo PageInfo { get; set; }
     }
 }
