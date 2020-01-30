@@ -1,9 +1,9 @@
 ﻿using GraphQL;
+using GraphQL.Server.Authorization.AspNetCore;
 using GraphQL.Types;
 using Jellypic.Web.Common;
 using Jellypic.Web.GraphQL.Inputs;
 using Jellypic.Web.GraphQL.Payloads;
-using Jellypic.Web.GraphQL.Types;
 using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
 using Jellypic.Web.Services;
@@ -54,7 +54,7 @@ namespace Jellypic.Web.GraphQL
 
                         return posts.Select(p => new AddPostPayload { Subject = p }).ToList();
                     }
-                });
+                }).AuthorizeWith("LoggedIn");
 
             FieldAsync<AddLikePayloadType>(
                 "addLike",
@@ -89,7 +89,7 @@ namespace Jellypic.Web.GraphQL
 
                         return new AddLikePayload { Subject = like };
                     }
-                });
+                }).AuthorizeWith("LoggedIn");
 
             FieldAsync<RemoveLikePayloadType>(
                 "removeLike",
@@ -115,7 +115,7 @@ namespace Jellypic.Web.GraphQL
 
                         return new RemoveLikePayload { AffectedRows = 1, PostId = post.Id };
                     }
-                });
+                }).AuthorizeWith("LoggedIn");
 
             FieldAsync<AddCommentPayloadType>(
                 "addComment",
@@ -148,7 +148,7 @@ namespace Jellypic.Web.GraphQL
 
                         return new AddCommentPayload { Subject = comment };
                     }
-                });
+                }).AuthorizeWith("LoggedIn");
 
             FieldAsync<RemoveCommentPayloadType>(
                 "removeComment",
@@ -168,7 +168,7 @@ namespace Jellypic.Web.GraphQL
                         await dc.SaveChangesAsync();
                         return new RemoveCommentPayload { AffectedRows = 1, PostId = comment.PostId };
                     }
-                });
+                }).AuthorizeWith("LoggedIn");
 
             FieldAsync<AddSubscriptionPayloadType>(
                 "addSubscription",
@@ -194,7 +194,7 @@ namespace Jellypic.Web.GraphQL
                         await dc.SaveChangesAsync();
                         return new AddSubscriptionPayload { Subject = subscription };
                     }
-                });
+                }).AuthorizeWith("LoggedIn");
 
             FieldAsync<RemoveSubscriptionPayloadType>(
                 "removeSubscription",
@@ -217,7 +217,7 @@ namespace Jellypic.Web.GraphQL
                         await dc.SaveChangesAsync();
                         return new RemoveSubscriptionPayload { AffectedRows = 1 };
                     }
-                });
+                }).AuthorizeWith("LoggedIn");
         }
     }
 }

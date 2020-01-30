@@ -95,7 +95,7 @@ namespace Jellypic.Web.GraphQL
 
                         return subscription;
                     }
-                });
+                }).AuthorizeWith("LoggedIn");
 
             FieldAsync<NonNullGraphType<NotificationConnectionType>>(
                 "notifications",
