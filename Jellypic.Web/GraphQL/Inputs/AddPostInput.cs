@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace Jellypic.Web.GraphQL.Inputs
 {
-    public class CreatePostInput
+    public class AddPostInput
     {
         public string CloudinaryPublicId { get; set; }
     }
 
-    public class CreatePostInputType : InputObjectGraphType
+    public class AddPostInputType : InputObjectGraphType
     {
-        public CreatePostInputType()
+        public AddPostInputType()
         {
-            Name = "CreatePostInput";
+            Name = "AddPostInput";
             Field<NonNullGraphType<StringGraphType>>("cloudinaryPublicId");
         }
     }

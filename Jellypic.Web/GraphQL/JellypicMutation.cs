@@ -33,13 +33,13 @@ namespace Jellypic.Web.GraphQL
                     };
                 });
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<CreatePostPayloadType>>>>(
-                "createPost",
+            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<AddPostPayloadType>>>>(
+                "addPosts",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<ListGraphType<NonNullGraphType<CreatePostInputType>>>> { Name = "inputs" }),
+                    new QueryArgument<NonNullGraphType<ListGraphType<NonNullGraphType<AddPostInputType>>>> { Name = "inputs" }),
                 resolve: async context =>
                 {
-                    var inputs = context.GetArgument<List<CreatePostInput>>("inputs");
+                    var inputs = context.GetArgument<List<AddPostInput>>("inputs");
                     var posts = inputs.Select(i => new Post
                     {
                         CreatedAt = DateTime.UtcNow,
@@ -52,7 +52,7 @@ namespace Jellypic.Web.GraphQL
                         dc.Posts.AddRange(posts);
                         await dc.SaveChangesAsync();
 
-                        return posts.Select(p => new CreatePostPayload { Subject = p }).ToList();
+                        return posts.Select(p => new AddPostPayload { Subject = p }).ToList();
                     }
                 });
 
