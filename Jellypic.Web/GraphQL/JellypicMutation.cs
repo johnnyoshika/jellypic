@@ -20,7 +20,7 @@ namespace Jellypic.Web.GraphQL
     {
         public JellypicMutation(IUserLogin userLogin, IUserContext userContext, Func<JellypicContext> dataContext, INotificationCreator notificationCreator, IHttpContextAccessor accessor)
         {
-            FieldAsync<LoginPayloadType>(
+            FieldAsync<NonNullGraphType<LoginPayloadType>>(
                 "login",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<LoginInputType>> { Name = "input" }),
@@ -56,7 +56,7 @@ namespace Jellypic.Web.GraphQL
                     }
                 }).AuthorizeWith("LoggedIn");
 
-            FieldAsync<AddLikePayloadType>(
+            FieldAsync<NonNullGraphType<AddLikePayloadType>>(
                 "addLike",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<AddLikeInputType>> { Name = "input" }),
@@ -91,7 +91,7 @@ namespace Jellypic.Web.GraphQL
                     }
                 }).AuthorizeWith("LoggedIn");
 
-            FieldAsync<RemoveLikePayloadType>(
+            FieldAsync<NonNullGraphType<RemoveLikePayloadType>>(
                 "removeLike",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<RemoveLikeInputType>> { Name = "input" }),
@@ -117,7 +117,7 @@ namespace Jellypic.Web.GraphQL
                     }
                 }).AuthorizeWith("LoggedIn");
 
-            FieldAsync<AddCommentPayloadType>(
+            FieldAsync<NonNullGraphType<AddCommentPayloadType>>(
                 "addComment",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<AddCommentInputType>> { Name = "input" }),
@@ -150,7 +150,7 @@ namespace Jellypic.Web.GraphQL
                     }
                 }).AuthorizeWith("LoggedIn");
 
-            FieldAsync<RemoveCommentPayloadType>(
+            FieldAsync<NonNullGraphType<RemoveCommentPayloadType>>(
                 "removeComment",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<RemoveCommentInputType>> { Name = "input" }),
@@ -170,7 +170,7 @@ namespace Jellypic.Web.GraphQL
                     }
                 }).AuthorizeWith("LoggedIn");
 
-            FieldAsync<AddSubscriptionPayloadType>(
+            FieldAsync<NonNullGraphType<AddSubscriptionPayloadType>>(
                 "addSubscription",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<AddSubscriptionInputType>> { Name = "input" }),
@@ -196,7 +196,7 @@ namespace Jellypic.Web.GraphQL
                     }
                 }).AuthorizeWith("LoggedIn");
 
-            FieldAsync<RemoveSubscriptionPayloadType>(
+            FieldAsync<NonNullGraphType<RemoveSubscriptionPayloadType>>(
                 "removeSubscription",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<RemoveSubscriptionInputType>> { Name = "input" }),
