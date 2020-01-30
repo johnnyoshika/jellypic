@@ -76,7 +76,6 @@ namespace Jellypic.Web
             services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]), ServiceLifetime.Transient);
             services.AddTransient<Func<JellypicContext>>(options => () => options.GetService<JellypicContext>());
 
-            services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
             services.AddScoped<JellypicSchema>();
             services
                 .AddGraphQL(options =>
@@ -84,7 +83,6 @@ namespace Jellypic.Web
                     options.ExposeExceptions = Env.IsDevelopment(); // expose detailed exceptions in JSON response
                 })
                 .AddGraphTypes(ServiceLifetime.Scoped)
-                .AddUserContextBuilder(httpContext => httpContext.User)
                 .AddDataLoader();
             services
                 .AddTransient<IValidationRule, AuthorizationValidationRule>()
