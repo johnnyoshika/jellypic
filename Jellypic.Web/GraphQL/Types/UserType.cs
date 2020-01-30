@@ -27,7 +27,7 @@ namespace Jellypic.Web.GraphQL.Types
                 resolve: async context =>
                 {
                     int? after = context.GetArgument<int?>("after");
-                    return await dataContext.PostConnectionsAsync(p =>
+                    return await dataContext.PostConnectionAsync(p =>
                         p.UserId == context.Source.Id
                         &&
                         (!after.HasValue || p.Id < after));

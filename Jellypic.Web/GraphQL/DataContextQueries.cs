@@ -10,7 +10,7 @@ namespace Jellypic.Web.GraphQL
 {
     public static class DataContextQueries
     {
-        public static async Task<PostConnection> PostConnectionsAsync(this Func<JellypicContext> dataContext, Expression<Func<Post, bool>> filter)
+        public static async Task<PostConnection> PostConnectionAsync(this Func<JellypicContext> dataContext, Expression<Func<Post, bool>> filter)
         {
             int take = 12;
 

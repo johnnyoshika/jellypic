@@ -73,7 +73,7 @@ namespace Jellypic.Web.GraphQL
                 resolve: async context =>
                 {
                     int? after = context.GetArgument<int?>("after");
-                    return await dataContext.PostConnectionsAsync(p => !after.HasValue || p.Id < after);
+                    return await dataContext.PostConnectionAsync(p => !after.HasValue || p.Id < after);
                 }).AuthorizeWith("LoggedIn");
 
             FieldAsync<SubscriptionType>(
