@@ -7,6 +7,7 @@ using Jellypic.Web.GraphQL.Types;
 using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
 using Jellypic.Web.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace Jellypic.Web.GraphQL
 {
     public class JellypicMutation : ObjectGraphType
     {
-        public JellypicMutation(IUserLogin userLogin, IUserContext userContext, Func<JellypicContext> dataContext, INotificationCreator notificationCreator)
+        public JellypicMutation(IUserLogin userLogin, IUserContext userContext, Func<JellypicContext> dataContext, INotificationCreator notificationCreator, IHttpContextAccessor accessor)
         {
             FieldAsync<LoginPayloadType>(
                 "login",
@@ -166,6 +167,55 @@ namespace Jellypic.Web.GraphQL
                         dc.Comments.Remove(comment);
                         await dc.SaveChangesAsync();
                         return new RemoveCommentPayload { AffectedRows = 1, PostId = comment.PostId };
+                    }
+                });
+
+            FieldAsync<AddSubscriptionPayloadType>(
+                "addSubscription",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<AddSubscriptionInputType>> { Name = "input" }),
+                resolve: async context =>
+                {
+                    var input = context.GetArgument<AddSubscriptionInput>("input");
+
+                    using (var dc = dataContext())
+                    {
+                        var subscription = new Subscription
+                        {
+                            UserId = userContext.UserId,
+                            Endpoint = input.Endpoint,
+                            P256DH = input.P256DH,
+                            Auth = input.Auth,
+                            CreatedAt = DateTime.UtcNow,
+                            UserAgent = accessor.HttpContext.Request.Headers["User-Agent"].ToString()
+                        };
+
+                        dc.Subscriptions.Add(subscription);
+                        await dc.SaveChangesAsync();
+                        return new AddSubscriptionPayload { Subject = subscription };
+                    }
+                });
+
+            FieldAsync<RemoveSubscriptionPayloadType>(
+                "removeSubscription",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<RemoveSubscriptionInputType>> { Name = "input" }),
+                resolve: async context =>
+                {
+                    var input = context.GetArgument<RemoveSubscriptionInput>("input");
+
+                    using (var dc = dataContext())
+                    {
+                        var subscription = await dc.Subscriptions.FirstOrDefaultAsync(s => s.Endpoint == input.Endpoint);
+                        if (subscription == null)
+                            return new RemoveSubscriptionPayload { AffectedRows = 0 };
+
+                        if (subscription.UserId != userContext.UserId)
+                            throw new UnauthorizedAccessException();
+
+                        dc.Subscriptions.Remove(subscription);
+                        await dc.SaveChangesAsync();
+                        return new RemoveSubscriptionPayload { AffectedRows = 1 };
                     }
                 });
         }

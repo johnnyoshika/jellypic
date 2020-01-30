@@ -75,6 +75,27 @@ namespace Jellypic.Web.GraphQL
                     int? after = context.GetArgument<int?>("after");
                     return await dataContext.PostConnectionsAsync(p => !after.HasValue || p.Id < after);
                 }).AuthorizeWith("LoggedIn");
+
+            FieldAsync<SubscriptionType>(
+                "subscription",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "endpoint" }),
+                resolve: async context =>
+                {
+                    using (var dc = dataContext())
+                    {
+                        string endpoint = context.GetArgument<string>("endpoint");
+                        var subscription = await dc.Subscriptions.FirstOrDefaultAsync(s => s.Endpoint == endpoint);
+
+                        if (subscription == null)
+                            return null;
+
+                        if (subscription.UserId != userContext.UserId)
+                            throw new UnauthorizedAccessException();
+
+                        return subscription;
+                    }
+                });
         }
     }
 }
