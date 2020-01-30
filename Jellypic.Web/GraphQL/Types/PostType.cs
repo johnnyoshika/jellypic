@@ -15,7 +15,7 @@ namespace Jellypic.Web.GraphQL.Types
         {
             Name = "Post";
 
-            Field(t => t.Id);
+            Field(t => t.Id, type: typeof(IdGraphType));
             Field(t => t.CreatedAt, type: typeof(DateTimeGraphType));
             Field(t => t.CloudinaryPublicId);
 

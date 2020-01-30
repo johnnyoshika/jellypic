@@ -13,7 +13,7 @@ namespace Jellypic.Web.GraphQL.Types
         {
             Name = "User";
 
-            Field(t => t.Id);
+            Field(t => t.Id, type: typeof(IdGraphType));
             Field(t => t.Username);
             Field(t => t.FirstName);
             Field(t => t.LastName);

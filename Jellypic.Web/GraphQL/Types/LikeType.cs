@@ -15,7 +15,7 @@ namespace Jellypic.Web.GraphQL.Types
         {
             Name = "Like";
 
-            Field(t => t.Id);
+            Field(t => t.Id, type: typeof(IdGraphType));
             Field(t => t.CreatedAt, type: typeof(DateTimeGraphType));
 
             Field<NonNullGraphType<UserType>>(
