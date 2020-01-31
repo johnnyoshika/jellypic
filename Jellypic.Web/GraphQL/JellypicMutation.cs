@@ -4,6 +4,7 @@ using GraphQL.Types;
 using Jellypic.Web.Common;
 using Jellypic.Web.GraphQL.Inputs;
 using Jellypic.Web.GraphQL.Payloads;
+using Jellypic.Web.GraphQL.Subscriptions;
 using Jellypic.Web.Infrastructure;
 using Jellypic.Web.Models;
 using Jellypic.Web.Services;
@@ -18,7 +19,13 @@ namespace Jellypic.Web.GraphQL
 {
     public class JellypicMutation : ObjectGraphType
     {
-        public JellypicMutation(IUserLogin userLogin, IUserContext userContext, Func<JellypicContext> dataContext, INotificationCreator notificationCreator, IHttpContextAccessor accessor)
+        public JellypicMutation(
+            IUserLogin userLogin,
+            IUserContext userContext,
+            Func<JellypicContext> dataContext,
+            INotificationCreator notificationCreator,
+            PostsAddedSubscriptionService postsAddedSubscription,
+            IHttpContextAccessor accessor)
         {
             FieldAsync<NonNullGraphType<LoginPayloadType>>(
                 "login",
@@ -51,8 +58,9 @@ namespace Jellypic.Web.GraphQL
                     {
                         dc.Posts.AddRange(posts);
                         await dc.SaveChangesAsync();
-
-                        return posts.Select(p => new AddPostPayload { Subject = p }).ToList();
+                        var payloads = posts.Select(p => new AddPostPayload { Subject = p }).ToList();
+                        postsAddedSubscription.Notify(payloads);
+                        return payloads;
                     }
                 }).AuthorizeWith("LoggedIn");
 
