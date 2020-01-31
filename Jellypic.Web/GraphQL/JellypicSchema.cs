@@ -14,6 +14,7 @@ namespace Jellypic.Web.GraphQL
         {
             Query = provider.GetRequiredService<JellypicQuery>();
             Mutation = provider.GetRequiredService<JellypicMutation>();
+            Subscription = provider.GetRequiredService<JellypicSubscription>();
         }
     }
 }
