@@ -25,6 +25,7 @@ using GraphQL.Server.Ui.Playground;
 using Jellypic.Web.Services;
 using Jellypic.Web.GraphQL;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Jellypic.Web.GraphQL.Subscriptions;
 
 namespace Jellypic.Web
 {
@@ -73,6 +74,7 @@ namespace Jellypic.Web
             services.AddScoped<INotificationCreator, NotificationCreator>();
             services.AddScoped<IWebPushSender, WebPushSender>();
             services.AddScoped<IBatchLoader, BatchLoader>();
+            services.AddSingleton<PostsAddedSubscriptionService>();
             services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]), ServiceLifetime.Transient);
             services.AddTransient<Func<JellypicContext>>(options => () => options.GetService<JellypicContext>());
 
