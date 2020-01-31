@@ -85,7 +85,8 @@ namespace Jellypic.Web
                     options.ExposeExceptions = Env.IsDevelopment(); // expose detailed exceptions in JSON response
                 })
                 .AddGraphTypes(ServiceLifetime.Scoped)
-                .AddDataLoader();
+                .AddDataLoader()
+                .AddWebSockets();
             services
                 .AddTransient<IValidationRule, AuthorizationValidationRule>()
                 .AddAuthorization(options =>
@@ -114,6 +115,8 @@ namespace Jellypic.Web
             app.UseMiddleware<AuthenticationMiddleware>();
             app.UseMiddleware<ActivityRecordingMiddleware>();
             app.UseStaticFiles();
+            app.UseWebSockets();
+            app.UseGraphQLWebSockets<JellypicSchema>();
             app.UseGraphQL<JellypicSchema>();
 
             if (env.IsDevelopment())
