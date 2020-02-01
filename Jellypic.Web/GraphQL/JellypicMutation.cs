@@ -25,6 +25,7 @@ namespace Jellypic.Web.GraphQL
             Func<JellypicContext> dataContext,
             INotificationCreator notificationCreator,
             PostsAddedSubscriptionService postsAddedSubscription,
+            PostUpdatedSubscriptionService postUpdatedSubscription,
             IHttpContextAccessor accessor)
         {
             FieldAsync<NonNullGraphType<LoginPayloadType>>(
@@ -92,6 +93,8 @@ namespace Jellypic.Web.GraphQL
 
                         await dc.SaveChangesAsync();
 
+                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Subject = post });
+
                         if (userContext.UserId != post.UserId)
                             await notificationCreator.CreateAsync(userContext.UserId, post, Models.NotificationType.Like);
 
@@ -120,6 +123,8 @@ namespace Jellypic.Web.GraphQL
                         dc.Likes.Remove(like);
 
                         await dc.SaveChangesAsync();
+                        
+                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Subject = post });
 
                         return new RemoveLikePayload { AffectedRows = 1, PostId = post.Id };
                     }
@@ -151,6 +156,8 @@ namespace Jellypic.Web.GraphQL
 
                         await dc.SaveChangesAsync();
 
+                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Subject = post });
+
                         if (userContext.UserId != post.UserId)
                             await notificationCreator.CreateAsync(userContext.UserId, post, Models.NotificationType.Comment);
 
@@ -168,12 +175,18 @@ namespace Jellypic.Web.GraphQL
 
                     using (var dc = dataContext())
                     {
-                        var comment = await dc.Comments.FirstOrDefaultAsync(c => c.UserId == userContext.UserId && c.Id == input.Id);
+                        var comment = await dc.Comments
+                            .Include(c => c.Post)
+                            .FirstOrDefaultAsync(c => c.UserId == userContext.UserId && c.Id == input.Id);
+
                         if (comment == null)
                             return new RemoveCommentPayload { AffectedRows = 0 };
 
                         dc.Comments.Remove(comment);
                         await dc.SaveChangesAsync();
+
+                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Subject = comment.Post });
+
                         return new RemoveCommentPayload { AffectedRows = 1, PostId = comment.PostId };
                     }
                 }).AuthorizeWith("LoggedIn");
