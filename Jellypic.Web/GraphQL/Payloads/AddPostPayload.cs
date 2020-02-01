@@ -10,7 +10,7 @@ namespace Jellypic.Web.GraphQL.Payloads
 {
     public class AddPostPayload
     {
-        public Post Subject { get; set; }
+        public Post Post { get; set; }
     }
 
     public class AddPostPayloadType : ObjectGraphType<AddPostPayload>
@@ -18,7 +18,7 @@ namespace Jellypic.Web.GraphQL.Payloads
         public AddPostPayloadType()
         {
             Name = "AddPostPayload";
-            Field(t => t.Subject, type: typeof(NonNullGraphType<PostType>));
+            Field(t => t.Post, type: typeof(NonNullGraphType<PostType>));
         }
     }
 }

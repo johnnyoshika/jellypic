@@ -59,7 +59,7 @@ namespace Jellypic.Web.GraphQL
                     {
                         dc.Posts.AddRange(posts);
                         await dc.SaveChangesAsync();
-                        var payloads = posts.Select(p => new AddPostPayload { Subject = p }).ToList();
+                        var payloads = posts.Select(p => new AddPostPayload { Post = p }).ToList();
                         postsAddedSubscription.Notify(payloads);
                         return payloads;
                     }
@@ -81,7 +81,7 @@ namespace Jellypic.Web.GraphQL
 
                         var like = await dc.Likes.FirstOrDefaultAsync(l => l.UserId == userContext.UserId && l.PostId == post.Id);
                         if (like != null)
-                            return new AddLikePayload { Subject = like };
+                            return new AddLikePayload { Like = like };
 
                         like = new Like
                         {
@@ -93,12 +93,12 @@ namespace Jellypic.Web.GraphQL
 
                         await dc.SaveChangesAsync();
 
-                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Subject = post });
+                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Post = post });
 
                         if (userContext.UserId != post.UserId)
                             await notificationCreator.CreateAsync(userContext.UserId, post, Models.NotificationType.Like);
 
-                        return new AddLikePayload { Subject = like };
+                        return new AddLikePayload { Like = like };
                     }
                 }).AuthorizeWith("LoggedIn");
 
@@ -124,7 +124,7 @@ namespace Jellypic.Web.GraphQL
 
                         await dc.SaveChangesAsync();
                         
-                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Subject = post });
+                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Post = post });
 
                         return new RemoveLikePayload { AffectedRows = 1, PostId = post.Id };
                     }
@@ -156,12 +156,12 @@ namespace Jellypic.Web.GraphQL
 
                         await dc.SaveChangesAsync();
 
-                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Subject = post });
+                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Post = post });
 
                         if (userContext.UserId != post.UserId)
                             await notificationCreator.CreateAsync(userContext.UserId, post, Models.NotificationType.Comment);
 
-                        return new AddCommentPayload { Subject = comment };
+                        return new AddCommentPayload { Comment = comment };
                     }
                 }).AuthorizeWith("LoggedIn");
 
@@ -185,7 +185,7 @@ namespace Jellypic.Web.GraphQL
                         dc.Comments.Remove(comment);
                         await dc.SaveChangesAsync();
 
-                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Subject = comment.Post });
+                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Post = comment.Post });
 
                         return new RemoveCommentPayload { AffectedRows = 1, PostId = comment.PostId };
                     }
@@ -213,7 +213,7 @@ namespace Jellypic.Web.GraphQL
 
                         dc.Subscriptions.Add(subscription);
                         await dc.SaveChangesAsync();
-                        return new AddSubscriptionPayload { Subject = subscription };
+                        return new AddSubscriptionPayload { Subscription = subscription };
                     }
                 }).AuthorizeWith("LoggedIn");
 

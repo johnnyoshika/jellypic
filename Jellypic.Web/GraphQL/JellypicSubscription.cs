@@ -33,7 +33,7 @@ namespace Jellypic.Web.GraphQL
                 Subscriber = new EventStreamResolver<UpdatedPostPayload>(context =>
                 {
                     var id = context.GetArgument<int>("id");
-                    return postUpdatedSubscription.GetPost().Where(p => p.Subject.Id == id);
+                    return postUpdatedSubscription.GetPost().Where(p => p.Post.Id == id);
                 })
             });
         }
