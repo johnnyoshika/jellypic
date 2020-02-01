@@ -95,6 +95,8 @@ namespace Jellypic.Web
                     options.AddPolicy("LoggedIn", p => p.RequireAuthenticatedUser());
                 });
 
+            services.AddCors();
+
             // Temporarily allow synchronous IO, as it's required to overcome a bug in GraphQL.Net in .Net Core 3:
             // https://github.com/graphql-dotnet/graphql-dotnet/issues/1161#issuecomment-540197786
             services.Configure<IISServerOptions>(options =>
@@ -110,6 +112,14 @@ namespace Jellypic.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors(builder =>
+                builder.WithOrigins(
+                    "http://localhost:3000",
+                    "https://localhost:3000")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials());
+
             app.UseMiddleware<NoCacheMiddleware>(new NoCacheOptions("/sw.js"));
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseAuthentication();
