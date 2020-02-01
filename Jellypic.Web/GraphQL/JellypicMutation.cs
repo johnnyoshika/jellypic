@@ -81,7 +81,7 @@ namespace Jellypic.Web.GraphQL
 
                         var like = await dc.Likes.FirstOrDefaultAsync(l => l.UserId == userContext.UserId && l.PostId == post.Id);
                         if (like != null)
-                            return new AddLikePayload { Like = like };
+                            return new AddLikePayload { Like = like, Post = post };
 
                         like = new Like
                         {
@@ -98,7 +98,7 @@ namespace Jellypic.Web.GraphQL
                         if (userContext.UserId != post.UserId)
                             await notificationCreator.CreateAsync(userContext.UserId, post, Models.NotificationType.Like);
 
-                        return new AddLikePayload { Like = like };
+                        return new AddLikePayload { Like = like, Post = post };
                     }
                 }).AuthorizeWith("LoggedIn");
 
@@ -118,7 +118,7 @@ namespace Jellypic.Web.GraphQL
 
                         var like = await dc.Likes.FirstOrDefaultAsync(l => l.UserId == userContext.UserId && l.PostId == post.Id);
                         if (like == null)
-                            return new RemoveLikePayload { AffectedRows = 0, PostId = post.Id };
+                            return new RemoveLikePayload { AffectedRows = 0, Post = post };
 
                         dc.Likes.Remove(like);
 
@@ -126,7 +126,7 @@ namespace Jellypic.Web.GraphQL
                         
                         postUpdatedSubscription.Notify(new UpdatedPostPayload { Post = post });
 
-                        return new RemoveLikePayload { AffectedRows = 1, PostId = post.Id };
+                        return new RemoveLikePayload { AffectedRows = 1, Post = post };
                     }
                 }).AuthorizeWith("LoggedIn");
 
@@ -161,7 +161,7 @@ namespace Jellypic.Web.GraphQL
                         if (userContext.UserId != post.UserId)
                             await notificationCreator.CreateAsync(userContext.UserId, post, Models.NotificationType.Comment);
 
-                        return new AddCommentPayload { Comment = comment };
+                        return new AddCommentPayload { Comment = comment, Post = post };
                     }
                 }).AuthorizeWith("LoggedIn");
 
@@ -180,14 +180,14 @@ namespace Jellypic.Web.GraphQL
                             .FirstOrDefaultAsync(c => c.UserId == userContext.UserId && c.Id == input.Id);
 
                         if (comment == null)
-                            return new RemoveCommentPayload { AffectedRows = 0 };
+                            throw new ExecutionError($"Comment id '{input.Id}' not found.");
 
                         dc.Comments.Remove(comment);
                         await dc.SaveChangesAsync();
 
                         postUpdatedSubscription.Notify(new UpdatedPostPayload { Post = comment.Post });
 
-                        return new RemoveCommentPayload { AffectedRows = 1, PostId = comment.PostId };
+                        return new RemoveCommentPayload { AffectedRows = 1, Post = comment.Post };
                     }
                 }).AuthorizeWith("LoggedIn");
 

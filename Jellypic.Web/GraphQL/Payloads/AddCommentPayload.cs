@@ -12,22 +12,16 @@ namespace Jellypic.Web.GraphQL.Payloads
     public class AddCommentPayload
     {
         public Comment Comment { get; set; }
+        public Post Post { get; set; }
     }
 
     public class AddCommentPayloadType : ObjectGraphType<AddCommentPayload>
     {
-        public AddCommentPayloadType(Func<JellypicContext> dataContext)
+        public AddCommentPayloadType()
         {
             Name = "AddCommentPayload";
             Field(t => t.Comment, type: typeof(NonNullGraphType<CommentType>));
-
-            FieldAsync<NonNullGraphType<PostType>>(
-                "post",
-                resolve: async context =>
-                {
-                    using (var dc = dataContext())
-                        return await dc.Posts.FirstAsync(p => p.Id == context.Source.Comment.PostId);
-                });
+            Field(t => t.Post, type: typeof(NonNullGraphType<PostType>));
         }
     }
 }

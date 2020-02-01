@@ -12,22 +12,16 @@ namespace Jellypic.Web.GraphQL.Payloads
     public class AddLikePayload
     {
         public Like Like { get; set; }
+        public Post Post { get; set; }
     }
 
     public class AddLikePayloadType : ObjectGraphType<AddLikePayload>
     {
-        public AddLikePayloadType(Func<JellypicContext> dataContext)
+        public AddLikePayloadType()
         {
             Name = "AddLikePayload";
             Field(t => t.Like, type: typeof(NonNullGraphType<LikeType>));
-
-            FieldAsync<NonNullGraphType<PostType>>(
-                "post",
-                resolve: async context =>
-                {
-                    using (var dc = dataContext())
-                        return await dc.Posts.FirstAsync(p => p.Id == context.Source.Like.PostId);
-                });
+            Field(t => t.Post, type: typeof(NonNullGraphType<PostType>));
         }
     }
 }

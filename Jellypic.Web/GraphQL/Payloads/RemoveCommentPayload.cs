@@ -12,26 +12,16 @@ namespace Jellypic.Web.GraphQL.Payloads
     public class RemoveCommentPayload
     {
         public int AffectedRows { get; set; }
-        public int? PostId { get; set; }
+        public Post Post { get; set; }
     }
 
     public class RemoveCommentPayloadType : ObjectGraphType<RemoveCommentPayload>
     {
-        public RemoveCommentPayloadType(Func<JellypicContext> dataContext)
+        public RemoveCommentPayloadType()
         {
             Name = "RemoveCommentPayload";
             Field(t => t.AffectedRows);
-
-            FieldAsync<PostType>(
-                "post",
-                resolve: async context =>
-                {
-                    if (!context.Source.PostId.HasValue)
-                        return null;
-
-                    using (var dc = dataContext())
-                        return await dc.Posts.FirstAsync(p => p.Id == context.Source.PostId);
-                });
+            Field(t => t.Post, type: typeof(NonNullGraphType<PostType>));
         }
     }
 }
