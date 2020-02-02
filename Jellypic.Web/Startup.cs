@@ -46,12 +46,6 @@ namespace Jellypic.Web
         {
             ConfigSettings.Current = new ConfigSettings(Configuration);
 
-            services.AddControllersWithViews(options =>
-            {
-                if (!Env.IsDevelopment())
-                    options.Filters.Add(new RequireHttpsAttribute());
-            });
-
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -120,12 +114,9 @@ namespace Jellypic.Web
                 .AllowAnyMethod()
                 .AllowCredentials());
 
-            app.UseMiddleware<NoCacheMiddleware>(new NoCacheOptions("/sw.js"));
-            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseAuthentication();
             app.UseMiddleware<AuthenticationMiddleware>();
             app.UseMiddleware<ActivityRecordingMiddleware>();
-            app.UseStaticFiles();
             app.UseWebSockets();
             app.UseGraphQLWebSockets<JellypicSchema>();
             app.UseGraphQL<JellypicSchema>();
@@ -133,17 +124,7 @@ namespace Jellypic.Web
             if (env.IsDevelopment())
                 app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
 
-            app.Use(async (context, next) =>
-            {
-                var path = context.Request.Path.Value;
-                if (!path.StartsWith("/api") && !path.StartsWith("/api") && !path.StartsWith("/privacy") && !Path.HasExtension(path))
-                    context.Request.Path = "/";
-
-                await next();
-            });
-            app.UseRouting();
             app.UseAuthorization();
-            app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
         }
     }
 }
