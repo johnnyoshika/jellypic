@@ -49,16 +49,7 @@ namespace Jellypic.Web
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(o =>
-                {
-                    o.Cookie.Name = "auth-token";
-                    o.Events.OnRedirectToLogin = context =>
-                     {
-                         context.Response.Headers["Location"] = context.RedirectUri;
-                         context.Response.StatusCode = 401;
-                         return Task.CompletedTask;
-                     };
-                });
+                .AddCookie(o => o.Cookie.Name = "auth-token");
 
             services.AddScoped<IUserContext, UserContext>();
             services.AddScoped<IUserLogin, UserLogin>();
