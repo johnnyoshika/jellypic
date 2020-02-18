@@ -28,9 +28,9 @@ namespace Jellypic.Web.GraphQL
                 Name = "postUpdated",
                 Arguments = new QueryArguments(
                     new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" }),
-                Type = typeof(NonNullGraphType<UpdatedPostPayloadType>),
-                Resolver = new FuncFieldResolver<UpdatedPostPayload>(context => context.Source as UpdatedPostPayload),
-                Subscriber = new EventStreamResolver<UpdatedPostPayload>(context =>
+                Type = typeof(NonNullGraphType<UpdatePostPayloadType>),
+                Resolver = new FuncFieldResolver<UpdatePostPayload>(context => context.Source as UpdatePostPayload),
+                Subscriber = new EventStreamResolver<UpdatePostPayload>(context =>
                 {
                     var id = context.GetArgument<int>("id");
                     return postUpdatedSubscription.GetPost().Where(p => p.Post.Id == id);

@@ -10,10 +10,10 @@ namespace Jellypic.Web.GraphQL.Subscriptions
 {
     public class PostUpdatedSubscriptionService
     {
-        readonly ISubject<UpdatedPostPayload> _postStream = new ReplaySubject<UpdatedPostPayload>(1);
+        readonly ISubject<UpdatePostPayload> _postStream = new ReplaySubject<UpdatePostPayload>(1);
 
-        public void Notify(UpdatedPostPayload payload) => _postStream.OnNext(payload); // Will send message to all subscribers
+        public void Notify(UpdatePostPayload payload) => _postStream.OnNext(payload); // Will send message to all subscribers
 
-        public IObservable<UpdatedPostPayload> GetPost() => _postStream.AsObservable();
+        public IObservable<UpdatePostPayload> GetPost() => _postStream.AsObservable();
     }
 }

@@ -93,7 +93,7 @@ namespace Jellypic.Web.GraphQL
 
                         await dc.SaveChangesAsync();
 
-                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Post = post });
+                        postUpdatedSubscription.Notify(new UpdatePostPayload { Post = post });
 
                         if (userContext.UserId != post.UserId)
                             await notificationCreator.CreateAsync(userContext.UserId, post, Models.NotificationType.Like);
@@ -124,7 +124,7 @@ namespace Jellypic.Web.GraphQL
 
                         await dc.SaveChangesAsync();
                         
-                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Post = post });
+                        postUpdatedSubscription.Notify(new UpdatePostPayload { Post = post });
 
                         return new RemoveLikePayload { AffectedRows = 1, Post = post };
                     }
@@ -156,7 +156,7 @@ namespace Jellypic.Web.GraphQL
 
                         await dc.SaveChangesAsync();
 
-                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Post = post });
+                        postUpdatedSubscription.Notify(new UpdatePostPayload { Post = post });
 
                         if (userContext.UserId != post.UserId)
                             await notificationCreator.CreateAsync(userContext.UserId, post, Models.NotificationType.Comment);
@@ -185,7 +185,7 @@ namespace Jellypic.Web.GraphQL
                         dc.Comments.Remove(comment);
                         await dc.SaveChangesAsync();
 
-                        postUpdatedSubscription.Notify(new UpdatedPostPayload { Post = comment.Post });
+                        postUpdatedSubscription.Notify(new UpdatePostPayload { Post = comment.Post });
 
                         return new RemoveCommentPayload { AffectedRows = 1, Post = comment.Post };
                     }

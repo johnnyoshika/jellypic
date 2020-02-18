@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace Jellypic.Web.GraphQL.Payloads
 {
-    public class UpdatedPostPayload
+    public class UpdatePostPayload
     {
         public Post Post { get; set; }
     }
 
-    public class UpdatedPostPayloadType : ObjectGraphType<UpdatedPostPayload>
+    public class UpdatePostPayloadType : ObjectGraphType<UpdatePostPayload>
     {
-        public UpdatedPostPayloadType()
+        public UpdatePostPayloadType()
         {
-            Name = "UpdatedPostPayload";
+            Name = "UpdatePostPayload";
             Field(t => t.Post, type: typeof(NonNullGraphType<PostType>));
         }
     }
