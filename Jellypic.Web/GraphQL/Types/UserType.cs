@@ -19,19 +19,6 @@ namespace Jellypic.Web.GraphQL.Types
             Field(t => t.LastName);
             Field(t => t.PictureUrl);
             Field(t => t.ThumbUrl);
-
-            FieldAsync<NonNullGraphType<PostConnectionType>>(
-                "posts",
-                arguments: new QueryArguments(
-                    new QueryArgument<IntGraphType> { Name = "after" }),
-                resolve: async context =>
-                {
-                    int? after = context.GetArgument<int?>("after");
-                    return await dataContext.PostConnectionAsync(p =>
-                        p.UserId == context.Source.Id
-                        &&
-                        (!after.HasValue || p.Id < after));
-                });
         }
     }
 }

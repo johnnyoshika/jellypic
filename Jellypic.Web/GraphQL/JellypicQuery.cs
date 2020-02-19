@@ -69,11 +69,15 @@ namespace Jellypic.Web.GraphQL
             FieldAsync<NonNullGraphType<PostConnectionType>>(
                 "posts",
                 arguments: new QueryArguments(
+                    new QueryArgument<IdGraphType> { Name = "userId" },
                     new QueryArgument<IntGraphType> { Name = "after" }),
                 resolve: async context =>
                 {
+                    int? userId = context.GetArgument<int?>("userId");
                     int? after = context.GetArgument<int?>("after");
-                    return await dataContext.PostConnectionAsync(p => !after.HasValue || p.Id < after);
+                    return await dataContext.PostConnectionAsync(p => 
+                        (!userId.HasValue || p.UserId == userId) &&
+                        (!after.HasValue || p.Id < after));
                 }).AuthorizeWith("LoggedIn");
 
             FieldAsync<SubscriptionType>(
