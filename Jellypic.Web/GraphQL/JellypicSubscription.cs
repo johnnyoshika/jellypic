@@ -18,9 +18,14 @@ namespace Jellypic.Web.GraphQL
             AddField(new EventStreamFieldType
             {
                 Name = "postsAdded",
+                Arguments = new QueryArguments(
+                    new QueryArgument<IdGraphType> { Name = "userId" }),
                 Type = typeof(NonNullGraphType<ListGraphType<NonNullGraphType<AddPostPayloadType>>>),
                 Resolver = new FuncFieldResolver<List<AddPostPayload>>(context => context.Source as List<AddPostPayload>),
-                Subscriber = new EventStreamResolver<List<AddPostPayload>>(context => postsAddedSubscription.GetPosts())
+                Subscriber = new EventStreamResolver<List<AddPostPayload>>(context => {
+                    var userId = context.GetArgument<int?>("userId");
+                    return postsAddedSubscription.GetPosts().Where(posts => !userId.HasValue || posts.Any(p => p.Post.UserId == userId));
+                })
             });
 
             AddField(new EventStreamFieldType
