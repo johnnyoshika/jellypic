@@ -15,7 +15,7 @@ namespace Jellypic.Web.GraphQL.Inputs
     {
         public RemoveSubscriptionInputType()
         {
-            Name = "DeleteSubscriptionInput";
+            Name = "RemoveSubscriptionInput";
             Field<NonNullGraphType<StringGraphType>>("endpoint");
         }
     }

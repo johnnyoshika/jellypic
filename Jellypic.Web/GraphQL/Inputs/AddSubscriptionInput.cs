@@ -17,7 +17,7 @@ namespace Jellypic.Web.GraphQL.Inputs
     {
         public AddSubscriptionInputType()
         {
-            Name = "CreateSubscriptionInput";
+            Name = "AddSubscriptionInput";
             Field<NonNullGraphType<StringGraphType>>("endpoint");
             Field<NonNullGraphType<StringGraphType>>("p256dh");
             Field<NonNullGraphType<StringGraphType>>("auth");
