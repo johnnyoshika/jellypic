@@ -227,14 +227,11 @@ namespace Jellypic.Web.GraphQL
 
                     using (var dc = dataContext())
                     {
-                        var subscription = await dc.Subscriptions.FirstOrDefaultAsync(s => s.Endpoint == input.Endpoint);
-                        if (subscription == null)
+                        var subscriptions = await dc.Subscriptions.Where(s => s.Endpoint == input.Endpoint && s.UserId == userContext.UserId).ToListAsync();
+                        if (!subscriptions.Any())
                             return new RemoveSubscriptionPayload { AffectedRows = 0 };
 
-                        if (subscription.UserId != userContext.UserId)
-                            throw new UnauthorizedAccessException();
-
-                        dc.Subscriptions.Remove(subscription);
+                        dc.Subscriptions.RemoveRange(subscriptions);
                         await dc.SaveChangesAsync();
                         return new RemoveSubscriptionPayload { AffectedRows = 1 };
                     }
