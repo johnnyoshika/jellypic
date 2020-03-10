@@ -100,7 +100,9 @@ namespace Jellypic.Web
             app.UseCors(builder =>
                 builder.WithOrigins(
                     "http://localhost:3000",
-                    "https://localhost:3000")
+                    "https://localhost:3000",
+                    "http://localhost:8080",
+                    "https://localhost:8080")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials());
