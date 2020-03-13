@@ -114,9 +114,7 @@ namespace Jellypic.Web
             app.UseWebSockets();
             app.UseGraphQLWebSockets<JellypicSchema>();
             app.UseGraphQL<JellypicSchema>();
-
-            if (env.IsDevelopment())
-                app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
+            app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
 
             app.UseAuthorization();
         }
