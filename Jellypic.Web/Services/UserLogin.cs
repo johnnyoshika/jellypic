@@ -15,13 +15,13 @@ namespace Jellypic.Web.Services
 {
     public class UserLogin : IUserLogin
     {
-        public UserLogin(JellypicContext dataContext, IHttpContextAccessor contextAccessor)
+        public UserLogin(Func<JellypicContext> dataContext, IHttpContextAccessor contextAccessor)
         {
             DataContext = dataContext;
             HttpContext = contextAccessor.HttpContext;
         }
 
-        JellypicContext DataContext { get; }
+        Func<JellypicContext> DataContext { get; }
         HttpContext HttpContext { get; }
 
         public async Task<User> LogInAsync(string facebookAccessToken)
@@ -44,28 +44,31 @@ namespace Jellypic.Web.Services
 
         async Task<User> UpsertAsync(FacebookUserResponse facebookUser)
         {
-            var user = await DataContext.Users.FirstOrDefaultAsync(u => u.AuthType == "Facebook" && u.AuthUserId == facebookUser.id);
-            if (user == null)
+            using (var dc = DataContext())
             {
-                user = new User();
-                user.CreatedAt = DateTime.UtcNow;
+                var user = await dc.Users.FirstOrDefaultAsync(u => u.AuthType == "Facebook" && u.AuthUserId == facebookUser.id);
+                if (user == null)
+                {
+                    user = new User();
+                    user.CreatedAt = DateTime.UtcNow;
+                }
+
+                user.Username = Regex.Replace(facebookUser.name.ToLower(), "[^a-z0-9]", string.Empty);
+                user.AuthType = "Facebook";
+                user.AuthUserId = facebookUser.id;
+                user.FirstName = facebookUser.first_name;
+                user.LastName = facebookUser.last_name;
+                user.LastActivityAt = DateTime.UtcNow;
+                user.LastLoggedInAt = DateTime.UtcNow;
+                user.ActivityCount++;
+                user.LoginCount++;
+
+                if (user.Id == 0)
+                    dc.Users.Add(user);
+
+                await dc.SaveChangesAsync();
+                return user;
             }
-
-            user.Username = Regex.Replace(facebookUser.name.ToLower(), "[^a-z0-9]", string.Empty);
-            user.AuthType = "Facebook";
-            user.AuthUserId = facebookUser.id;
-            user.FirstName = facebookUser.first_name;
-            user.LastName = facebookUser.last_name;
-            user.LastActivityAt = DateTime.UtcNow;
-            user.LastLoggedInAt = DateTime.UtcNow;
-            user.ActivityCount++;
-            user.LoginCount++;
-
-            if (user.Id == 0)
-                DataContext.Users.Add(user);
-
-            await DataContext.SaveChangesAsync();
-            return user;
         }
 
         async Task SignInAsync(User user)

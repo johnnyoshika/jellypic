@@ -17,7 +17,15 @@ using Jellypic.Web.Common;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
+using GraphQL;
+using GraphQL.Validation;
+using GraphQL.Server;
+using GraphQL.Server.Authorization.AspNetCore;
+using GraphQL.Server.Ui.Playground;
 using Jellypic.Web.Services;
+using Jellypic.Web.GraphQL;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Jellypic.Web.GraphQL.Subscriptions;
 
 namespace Jellypic.Web
 {
@@ -38,25 +46,10 @@ namespace Jellypic.Web
         {
             ConfigSettings.Current = new ConfigSettings(Configuration);
 
-            services.AddControllersWithViews(options =>
-            {
-                if (!Env.IsDevelopment())
-                    options.Filters.Add(new RequireHttpsAttribute());
-            });
-
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(o =>
-                {
-                    o.Cookie.Name = "auth-token";
-                    o.Events.OnRedirectToLogin = context =>
-                     {
-                         context.Response.Headers["Location"] = context.RedirectUri;
-                         context.Response.StatusCode = 401;
-                         return Task.CompletedTask;
-                     };
-                });
+                .AddCookie(o => o.Cookie.Name = "auth-token");
 
             services.AddScoped<IUserContext, UserContext>();
             services.AddScoped<IUserLogin, UserLogin>();
@@ -65,29 +58,67 @@ namespace Jellypic.Web
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationSender>();
             services.AddScoped<INotificationCreator, NotificationCreator>();
             services.AddScoped<IWebPushSender, WebPushSender>();
+            services.AddScoped<IBatchLoader, BatchLoader>();
+            services.AddSingleton<PostsAddedSubscriptionService>();
+            services.AddSingleton<PostUpdatedSubscriptionService>();
             services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]), ServiceLifetime.Transient);
+            services.AddTransient<Func<JellypicContext>>(options => () => options.GetService<JellypicContext>());
+
+            services.AddScoped<JellypicSchema>();
+            services
+                .AddGraphQL(options =>
+                {
+                    options.ExposeExceptions = Env.IsDevelopment(); // expose detailed exceptions in JSON response
+                })
+                .AddGraphTypes(ServiceLifetime.Scoped)
+                .AddDataLoader()
+                .AddWebSockets();
+            services
+                .AddTransient<IValidationRule, AuthorizationValidationRule>()
+                .AddAuthorization(options =>
+                {
+                    options.AddPolicy("LoggedIn", p => p.RequireAuthenticatedUser());
+                });
+
+            services.AddCors();
+
+            // Temporarily allow synchronous IO, as it's required to overcome a bug in GraphQL.Net in .Net Core 3:
+            // https://github.com/graphql-dotnet/graphql-dotnet/issues/1161#issuecomment-540197786
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseMiddleware<NoCacheMiddleware>(new NoCacheOptions("/sw.js"));
-            app.UseMiddleware<ErrorHandlingMiddleware>();
+            app.UseCors(builder =>
+                builder.WithOrigins(
+                    "http://localhost:3000",
+                    "https://localhost:3000",
+                    "http://localhost:8080",
+                    "https://localhost:8080",
+                    "https://jellypic.koopla.com")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials());
+
             app.UseAuthentication();
             app.UseMiddleware<AuthenticationMiddleware>();
             app.UseMiddleware<ActivityRecordingMiddleware>();
-            app.UseStaticFiles();
-            app.Use(async (context, next) =>
-            {
-                var path = context.Request.Path.Value;
-                if (!path.StartsWith("/api") && !path.StartsWith("/privacy") && !Path.HasExtension(path))
-                    context.Request.Path = "/";
+            app.UseWebSockets();
+            app.UseGraphQLWebSockets<JellypicSchema>();
+            app.UseGraphQL<JellypicSchema>();
 
-                await next();
-            });
-            app.UseRouting();
+            if (env.IsDevelopment())
+                app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
+
             app.UseAuthorization();
-            app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
         }
     }
 }

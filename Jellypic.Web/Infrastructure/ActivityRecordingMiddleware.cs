@@ -19,7 +19,9 @@ namespace Jellypic.Web.Infrastructure
 
         public async Task Invoke(HttpContext httpContext, IUserContext userContext, JellypicContext dataContext)
         {
-            if (httpContext.User.Identity.IsAuthenticated)
+            // GraphQL Playground continuously sends introspection queries that inflate the activity count.
+            // Those requests contain the header 'X-Apollo-Tracing'.
+            if (!httpContext.Request.Headers.ContainsKey("X-Apollo-Tracing") && httpContext.User.Identity.IsAuthenticated)
             {
                 var user = await dataContext.Users.FirstOrDefaultAsync(u => u.Id == userContext.UserId);
                 if (user != null)

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Jellypic.Web.Infrastructure
+namespace Jellypic.Web.Models
 {
-    public class BadRequestException : Exception
+    public class NotificationConnection : Connection<Notification>
     {
     }
 }

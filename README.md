@@ -10,7 +10,11 @@
 * Run database migrations by executing this command: `update-database`
 
 # Development
-* Clone [jellypick-dashboard](https://github.com/johnnyoshika/jellypic-dashboard) and use it for UI.
+* Run the project and use the GraphQL Playground here: https://localhost:44340/ui/playground
+
+OR
+
+* Clone [jellypick-client](https://github.com/johnnyoshika/jellypic-client) and use it for UI
 
 # EF Migration
 * After making changes to entities, run the following command in package manager console:
