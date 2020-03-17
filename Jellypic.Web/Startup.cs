@@ -49,7 +49,10 @@ namespace Jellypic.Web
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(o => o.Cookie.Name = "auth-token");
+                .AddCookie(o => {
+                    o.Cookie.Name = "auth-token";
+                    o.Cookie.SameSite = SameSiteMode.None; // Allow cookies in CORS when it's cross-domain
+                });
 
             services.AddScoped<IUserContext, UserContext>();
             services.AddScoped<IUserLogin, UserLogin>();
