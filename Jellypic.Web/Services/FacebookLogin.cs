@@ -1,13 +1,8 @@
 ﻿using Jellypic.Web.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -15,21 +10,19 @@ namespace Jellypic.Web.Services
 {
     public class FacebookLogin : IUserLogin
     {
-        public FacebookLogin(Func<JellypicContext> dataContext, IHttpContextAccessor contextAccessor)
+        public FacebookLogin(Func<JellypicContext> dataContext, ISignIn signIn)
         {
             DataContext = dataContext;
-            HttpContext = contextAccessor.HttpContext;
+            SignIn = signIn;
         }
 
         Func<JellypicContext> DataContext { get; }
-        HttpContext HttpContext { get; }
+        public ISignIn SignIn { get; }
 
         public async Task<User> LogInAsync(string token)
         {
             var user = await UpsertAsync(await FacebookUserAsync(token));
-
-            await SignInAsync(user);
-
+            await SignIn.SignInAsync(user.Id.ToString());
             return user;
         }
 
@@ -69,24 +62,6 @@ namespace Jellypic.Web.Services
                 await dc.SaveChangesAsync();
                 return user;
             }
-        }
-
-        async Task SignInAsync(User user)
-        {
-            // https://andrewlock.net/introduction-to-authentication-with-asp-net-core/
-            // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/cookie
-            var identity = new ClaimsIdentity(new List<Claim>
-            {
-                new Claim("UserId", user.Id.ToString(), ClaimValueTypes.Integer32)
-            }, "Cookie");
-
-            var principal = new ClaimsPrincipal(identity);
-
-            await HttpContext.SignInAsync(principal, new AuthenticationProperties
-            {
-                ExpiresUtc = DateTime.UtcNow.AddMonths(6),
-                IsPersistent = true
-            });
         }
 
         class FacebookUserResponse
