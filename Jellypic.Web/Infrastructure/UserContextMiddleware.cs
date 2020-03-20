@@ -9,9 +9,9 @@ using Newtonsoft.Json;
 
 namespace Jellypic.Web.Infrastructure
 {
-    public class AuthenticationMiddleware
+    public class UserContextMiddleware
     {
-        public AuthenticationMiddleware(RequestDelegate next)
+        public UserContextMiddleware(RequestDelegate next)
         {
             Next = next;
         }

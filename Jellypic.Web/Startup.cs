@@ -115,7 +115,7 @@ namespace Jellypic.Web
                 .AllowCredentials());
 
             app.UseAuthentication();
-            app.UseMiddleware<AuthenticationMiddleware>();
+            app.UseMiddleware<UserContextMiddleware>();
             app.UseMiddleware<ActivityRecordingMiddleware>();
             app.UseWebSockets();
             app.UseGraphQLWebSockets<JellypicSchema>();
