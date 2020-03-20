@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace Jellypic.Web.Services
 {
-    public class UserLogin : IUserLogin
+    public class FacebookLogin : IUserLogin
     {
-        public UserLogin(Func<JellypicContext> dataContext, IHttpContextAccessor contextAccessor)
+        public FacebookLogin(Func<JellypicContext> dataContext, IHttpContextAccessor contextAccessor)
         {
             DataContext = dataContext;
             HttpContext = contextAccessor.HttpContext;

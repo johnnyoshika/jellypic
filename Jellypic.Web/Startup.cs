@@ -55,7 +55,7 @@ namespace Jellypic.Web
                 });
 
             services.AddScoped<IUserContext, UserContext>();
-            services.AddScoped<IUserLogin, UserLogin>();
+            services.AddScoped<IUserLogin, FacebookLogin>();
             services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationWriter>();
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationSender>();
