@@ -8,7 +8,7 @@ namespace Jellypic.Web.GraphQL.Inputs
 {
     public class LoginInput
     {
-        public string AccessToken { get; set; }
+        public string Token { get; set; }
     }
 
     public class LoginInputType : InputObjectGraphType
@@ -16,7 +16,7 @@ namespace Jellypic.Web.GraphQL.Inputs
         public LoginInputType()
         {
             Name = "LoginInput";
-            Field<NonNullGraphType<StringGraphType>>("accessToken");
+            Field<NonNullGraphType<StringGraphType>>("token");
         }
     }
 }
