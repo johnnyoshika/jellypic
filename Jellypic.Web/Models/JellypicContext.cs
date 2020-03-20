@@ -55,6 +55,10 @@ namespace Jellypic.Web.Models
                     .IsRequired();
 
                 entity
+                    .Property(u => u.Gravatar)
+                    .HasMaxLength(500);
+
+                entity
                     .HasIndex(u => new { u.AuthType, u.AuthUserId })
                     .IsUnique();
             });
@@ -148,6 +152,8 @@ namespace Jellypic.Web.Models
 
         public string AuthType { get; set; }
         public string AuthUserId { get; set; }
+
+        public string Gravatar { get; set; }
 
         public List<Post> Posts { get; set; }
         public List<Like> Likes { get; set; }
