@@ -15,8 +15,8 @@ namespace Jellypic.Web.GraphQL.Types
         {
             Name = "Comment";
 
-            Field(t => t.Id, type: typeof(IdGraphType));
-            Field(t => t.CreatedAt, type: typeof(DateTimeGraphType));
+            Field(t => t.Id, type: typeof(NonNullGraphType<IdGraphType>));
+            Field(t => t.CreatedAt, type: typeof(NonNullGraphType<DateTimeGraphType>));
             Field(t => t.Text);
 
             Field<NonNullGraphType<UserType>>(

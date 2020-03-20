@@ -13,7 +13,7 @@ namespace Jellypic.Web.GraphQL.Types
         {
             Name = "Profile";
 
-            Field(t => t.Id, type: typeof(IdGraphType));
+            Field(t => t.Id, type: typeof(NonNullGraphType<IdGraphType>));
             Field(t => t.PostCount);
             Field(t => t.LikeCount);
             Field(t => t.CommentCount);
