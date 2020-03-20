@@ -162,6 +162,9 @@ namespace Jellypic.Web.Models
         public string PictureUrl {
             get
             {
+                if (Gravatar != null)
+                    return GravatarSize(Gravatar, 152);
+
                 if (AuthType == "Facebook")
                 {
                     var cloudinary = new CloudinaryUrlBuilder();
@@ -176,6 +179,9 @@ namespace Jellypic.Web.Models
         {
             get
             {
+                if (Gravatar != null)
+                    return GravatarSize(Gravatar, 30);
+
                 if (AuthType == "Facebook")
                 {
                     var cloudinary = new CloudinaryUrlBuilder();
@@ -185,6 +191,11 @@ namespace Jellypic.Web.Models
                 return null;
             }
         }
+
+        // https://en.gravatar.com/site/implement/images/
+        // r -> Rating, pg -> may contain rude gestures, provocatively dressed individuals, the lesser swear words, or mild violence
+        // d -> Default, mp -> mystery person
+        string GravatarSize(string url, int size) => $"{url}?s={size}&r=pg&d=mp";
 
         public object ToJson() =>
             new
