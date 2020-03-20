@@ -24,9 +24,9 @@ namespace Jellypic.Web.Services
         Func<JellypicContext> DataContext { get; }
         HttpContext HttpContext { get; }
 
-        public async Task<User> LogInAsync(string facebookAccessToken)
+        public async Task<User> LogInAsync(string token)
         {
-            var user = await UpsertAsync(await FacebookUserAsync(facebookAccessToken));
+            var user = await UpsertAsync(await FacebookUserAsync(token));
 
             await SignInAsync(user);
 

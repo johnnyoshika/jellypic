@@ -5,6 +5,6 @@ namespace Jellypic.Web.Services
 {
     public interface IUserLogin
     {
-        Task<User> LogInAsync(string facebookAccessToken);
+        Task<User> LogInAsync(string token);
     }
 }
