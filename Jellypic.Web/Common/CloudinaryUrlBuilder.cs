@@ -10,13 +10,13 @@ namespace Jellypic.Web.Common
     {
         public CloudinaryUrlBuilder()
         {
-            Cloudinary = new Cloudinary(new Account(
+            Cloudinary = new CloudinaryDotNet.Cloudinary(new Account(
                 ConfigSettings.Current.Cloudinary.CloudName,
                 ConfigSettings.Current.Cloudinary.ApiKey,
                 ConfigSettings.Current.Cloudinary.ApiSecret));
         }
 
-        Cloudinary Cloudinary { get; set; }
+        CloudinaryDotNet.Cloudinary Cloudinary { get; set; }
 
         public string Square(string publicId, int size) =>
             Cloudinary.Api.UrlImgUp

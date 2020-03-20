@@ -12,17 +12,17 @@ namespace Jellypic.Web
 
         public ConfigSettings(IConfiguration configuration)
         {
-            Cloudinary = new CloudinarySettings(configuration.GetSection("Cloudinary"));
+            Cloudinary = new Cloudinary(configuration.GetSection("Cloudinary"));
             WebPushVapidKeys = new WebPushVapidKeys(configuration.GetSection("WebPushVapidKeys"));
         }
 
-        public CloudinarySettings Cloudinary { get; }
+        public Cloudinary Cloudinary { get; }
         public WebPushVapidKeys WebPushVapidKeys { get; set; }
     }
 
-    public class CloudinarySettings
+    public class Cloudinary
     {
-        public CloudinarySettings(IConfigurationSection section)
+        public Cloudinary(IConfigurationSection section)
         {
             CloudName = section["CloudName"];
             ApiKey = section["ApiKey"];
