@@ -37,7 +37,7 @@ namespace Jellypic.Web.GraphQL
                     var input = context.GetArgument<LoginInput>("input");
                     return new LoginPayload
                     {
-                        Me = await userLogin.LogInAsync(input.AccessToken)
+                        Me = await userLogin.LogInAsync(input.Token)
                     };
                 });
 

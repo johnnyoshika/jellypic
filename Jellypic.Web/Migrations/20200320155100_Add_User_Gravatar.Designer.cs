@@ -4,14 +4,16 @@ using Jellypic.Web.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Jellypic.Web.Migrations
 {
     [DbContext(typeof(JellypicContext))]
-    partial class JellypicContextModelSnapshot : ModelSnapshot
+    [Migration("20200320155100_Add_User_Gravatar")]
+    partial class Add_User_Gravatar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
