@@ -15,11 +15,13 @@ namespace Jellypic.Web
             Cloudinary = new Cloudinary(configuration.GetSection("Cloudinary"));
             WebPushVapidKeys = new WebPushVapidKeys(configuration.GetSection("WebPushVapidKeys"));
             Auth0 = new Auth0(configuration.GetSection("Auth0"));
+            Encryptor = new Encryptor(configuration.GetSection("Encryptor"));
         }
 
         public Cloudinary Cloudinary { get; }
-        public WebPushVapidKeys WebPushVapidKeys { get; set; }
-        public Auth0 Auth0 { get; set; }
+        public WebPushVapidKeys WebPushVapidKeys { get; }
+        public Auth0 Auth0 { get; }
+        public Encryptor Encryptor { get; }
     }
 
     public class Cloudinary
@@ -58,5 +60,15 @@ namespace Jellypic.Web
 
         public string Domain { get; }
         public string ClientId { get; }
+    }
+
+    public class Encryptor
+    {
+        public Encryptor(IConfigurationSection section)
+        {
+            Key = section["Key"];
+        }
+
+        public string Key { get; }
     }
 }
