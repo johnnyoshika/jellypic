@@ -58,6 +58,7 @@ namespace Jellypic.Web
             services.AddScoped<ISignIn, SignIn>();
             services.AddScoped<IUserLogin, Auth0Login>();
             services.AddScoped<IAuth0TokenReader, Auth0TokenReader>();
+            services.AddScoped<IEncryptor, Services.Encryptor>();
             services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationWriter>();
             services.AddScoped<IEventHandler<NotifyEvent>, NotificationSender>();
