@@ -26,6 +26,7 @@ namespace Jellypic.Web.GraphQL
             INotificationCreator notificationCreator,
             PostsAddedSubscriptionService postsAddedSubscription,
             PostUpdatedSubscriptionService postUpdatedSubscription,
+            IEncryptor encryptor,
             IHttpContextAccessor accessor)
         {
             FieldAsync<NonNullGraphType<LoginPayloadType>>(
@@ -35,9 +36,11 @@ namespace Jellypic.Web.GraphQL
                 resolve: async context =>
                 {
                     var input = context.GetArgument<LoginInput>("input");
+                    var me = await userLogin.LogInAsync(input.Token);
                     return new LoginPayload
                     {
-                        Me = await userLogin.LogInAsync(input.Token)
+                        AuthToken = encryptor.Encrypt(me.Id.ToString()),
+                        Me = me
                     };
                 });
 
