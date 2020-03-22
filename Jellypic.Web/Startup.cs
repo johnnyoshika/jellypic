@@ -48,14 +48,7 @@ namespace Jellypic.Web
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(o => {
-                    o.Cookie.Name = "auth-token";
-                    o.Cookie.SameSite = SameSiteMode.None; // Allow cookies in CORS when it's cross-domain
-                });
-
             services.AddScoped<IUserContext, UserContext>();
-            services.AddScoped<ISignIn, SignIn>();
             services.AddScoped<IUserLogin, Auth0Login>();
             services.AddScoped<IAuth0TokenReader, Auth0TokenReader>();
             services.AddScoped<IEncryptor, Services.Encryptor>();
@@ -114,7 +107,6 @@ namespace Jellypic.Web
                 .AllowAnyMethod()
                 .AllowCredentials());
 
-            app.UseAuthentication();
             app.UseMiddleware<AuthorizationHeaderMiddleware>();
             app.UseMiddleware<UserContextMiddleware>();
             app.UseMiddleware<ActivityRecordingMiddleware>();
