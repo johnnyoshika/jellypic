@@ -10,23 +10,16 @@ namespace Jellypic.Web.Services
 {
     public class Auth0Login : IUserLogin
     {
-        public Auth0Login(Func<JellypicContext> dataContext, ISignIn signIn, IAuth0TokenReader tokenReader)
+        public Auth0Login(Func<JellypicContext> dataContext, IAuth0TokenReader tokenReader)
         {
             DataContext = dataContext;
-            SignIn = signIn;
             TokenReader = tokenReader;
         }
 
         Func<JellypicContext> DataContext { get; }
-        ISignIn SignIn { get; }
         IAuth0TokenReader TokenReader { get; }
 
-        public async Task<User> LogInAsync(string token)
-        {
-            var user = await UpsertAsync(await TokenReader.ReadAsync(token));
-            await SignIn.SignInAsync(user.Id.ToString());
-            return user;
-        }
+        public async Task<User> LogInAsync(string token) => await UpsertAsync(await TokenReader.ReadAsync(token));
 
         async Task<User> UpsertAsync(JwtSecurityToken securityToken)
         {
