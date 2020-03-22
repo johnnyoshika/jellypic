@@ -10,6 +10,7 @@ namespace Jellypic.Web.GraphQL.Payloads
 {
     public class LoginPayload
     {
+        public string AuthToken { get; set; }
         public User Me { get; set; }
     }
 
@@ -18,6 +19,7 @@ namespace Jellypic.Web.GraphQL.Payloads
         public LoginPayloadType()
         {
             Name = "LoginPayload";
+            Field(t => t.AuthToken);
             Field(t => t.Me, type: typeof(NonNullGraphType<UserType>));
         }
     }
