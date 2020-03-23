@@ -14,7 +14,7 @@ namespace Jellypic.Web.GraphQL.Types
             Name = "User";
 
             Field(t => t.Id, type: typeof(NonNullGraphType<IdGraphType>));
-            Field(t => t.Username);
+            Field(t => t.Nickname);
             Field(t => t.FirstName, type: typeof(StringGraphType));
             Field(t => t.LastName, type: typeof(StringGraphType));
             Field(t => t.PictureUrl, type: typeof(StringGraphType));

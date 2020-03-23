@@ -33,11 +33,12 @@ namespace Jellypic.Web.Services
                     user.CreatedAt = DateTime.UtcNow;
                 }
 
-                user.Username = securityToken.Claims.First(c => c.Type == "nickname").Value;
+                user.Nickname = securityToken.Claims.First(c => c.Type == "nickname").Value;
                 user.AuthType = "Auth0";
                 user.AuthUserId = auth0UserId;
-                user.FirstName = securityToken.Claims.First(c => c.Type == "name").Value;
-                user.Gravatar = UrlWithoutQuery(securityToken.Claims.FirstOrDefault(c => c.Type == "picture")?.Value);
+                user.FirstName = (securityToken.Claims.FirstOrDefault(c => c.Type == "given_name") ?? securityToken.Claims.FirstOrDefault(c => c.Type == "name"))?.Value;
+                user.LastName = securityToken.Claims.FirstOrDefault(c => c.Type == "family_name")?.Value;
+                user.Gravatar = GravatarUrl(securityToken.Claims.FirstOrDefault(c => c.Type == "picture")?.Value);
                 user.LastActivityAt = DateTime.UtcNow;
                 user.LastLoggedInAt = DateTime.UtcNow;
                 user.ActivityCount++;
@@ -51,6 +52,7 @@ namespace Jellypic.Web.Services
             }
         }
 
+        string GravatarUrl(string url) => url.Contains("gravatar.com") ? UrlWithoutQuery(url) : null;
         string UrlWithoutQuery(string url) => string.IsNullOrWhiteSpace(url) ? null : new Uri(url).GetLeftPart(UriPartial.Path);
     }
 }
