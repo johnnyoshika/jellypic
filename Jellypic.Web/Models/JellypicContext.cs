@@ -155,43 +155,31 @@ namespace Jellypic.Web.Models
         public List<Like> Likes { get; set; }
         public List<Comment> Comments { get; set; }
 
-        public string PictureUrl {
-            get
-            {
-                if (Gravatar != null)
-                    return GravatarSize(Gravatar, 152);
+        public string PictureUrl => GravatarSize(152) ?? FacebookPictureSize(152);
 
-                if (AuthType == "Facebook")
-                {
-                    var cloudinary = new CloudinaryUrlBuilder();
-                    return cloudinary.FacebookUser(AuthUserId, 152);
-                }
-
-                return null;
-            }
-        }
-
-        public string ThumbUrl
-        {
-            get
-            {
-                if (Gravatar != null)
-                    return GravatarSize(Gravatar, 30);
-
-                if (AuthType == "Facebook")
-                {
-                    var cloudinary = new CloudinaryUrlBuilder();
-                    return cloudinary.FacebookUser(AuthUserId, 30);
-                }
-
-                return null;
-            }
-        }
+        public string ThumbUrl => GravatarSize(30) ?? FacebookPictureSize(30);
 
         // https://en.gravatar.com/site/implement/images/
         // r -> Rating, pg -> may contain rude gestures, provocatively dressed individuals, the lesser swear words, or mild violence
         // d -> Default, mp -> mystery person
-        string GravatarSize(string url, int size) => $"{url}?s={size}&r=pg&d=mp";
+        string GravatarSize(int size) => Gravatar == null ? null : $"{Gravatar}?s={size}&r=pg&d=mp";
+
+        string FacebookPictureSize(int size)
+        {
+            if (AuthType == "Facebook")
+            {
+                var cloudinary = new CloudinaryUrlBuilder();
+                return cloudinary.FacebookUser(AuthUserId, size);
+            }
+
+            if (AuthType == "Auth0" && AuthUserId.StartsWith("facebook|"))
+            {
+                var cloudinary = new CloudinaryUrlBuilder();
+                return cloudinary.FacebookUser(AuthUserId.Split("|")[1], size);
+            }
+
+            return null;
+        }
 
         public object ToJson() =>
             new
