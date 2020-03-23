@@ -166,18 +166,12 @@ namespace Jellypic.Web.Models
 
         string FacebookPictureSize(int size)
         {
-            if (AuthType == "Facebook")
+            if (AuthType == "facebook")
             {
                 var cloudinary = new CloudinaryUrlBuilder();
                 return cloudinary.FacebookUser(AuthUserId, size);
             }
-
-            if (AuthType == "Auth0" && AuthUserId.StartsWith("facebook|"))
-            {
-                var cloudinary = new CloudinaryUrlBuilder();
-                return cloudinary.FacebookUser(AuthUserId.Split("|")[1], size);
-            }
-
+            
             return null;
         }
 

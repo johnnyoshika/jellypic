@@ -23,10 +23,12 @@ namespace Jellypic.Web.Services
 
         async Task<User> UpsertAsync(JwtSecurityToken securityToken)
         {
-            string auth0UserId = securityToken.Claims.First(c => c.Type == "sub").Value;
+            string sub = securityToken.Claims.First(c => c.Type == "sub").Value;
+            string authType = sub.Split('|')[0];
+            string authUserId = sub.Split('|')[1];
             using (var dc = DataContext())
             {
-                var user = await dc.Users.FirstOrDefaultAsync(u => u.AuthType == "Auth0" && u.AuthUserId == auth0UserId);
+                var user = await dc.Users.FirstOrDefaultAsync(u => u.AuthType == authType && u.AuthUserId == authUserId);
                 if (user == null)
                 {
                     user = new User();
@@ -34,8 +36,8 @@ namespace Jellypic.Web.Services
                 }
 
                 user.Nickname = securityToken.Claims.First(c => c.Type == "nickname").Value;
-                user.AuthType = "Auth0";
-                user.AuthUserId = auth0UserId;
+                user.AuthType = authType;
+                user.AuthUserId = authUserId;
                 user.FirstName = (securityToken.Claims.FirstOrDefault(c => c.Type == "given_name") ?? securityToken.Claims.FirstOrDefault(c => c.Type == "name"))?.Value;
                 user.LastName = securityToken.Claims.FirstOrDefault(c => c.Type == "family_name")?.Value;
                 user.Gravatar = GravatarUrl(securityToken.Claims.FirstOrDefault(c => c.Type == "picture")?.Value);
