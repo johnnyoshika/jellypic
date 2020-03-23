@@ -14,7 +14,7 @@
 
 OR
 
-* Clone [jellypick-client](https://github.com/johnnyoshika/jellypic-client) and use it for UI
+* Clone [jellypick-app](https://github.com/johnnyoshika/jellypic-app) and use it for UI
 
 # EF Migration
 * After making changes to entities, run the following command in package manager console:
