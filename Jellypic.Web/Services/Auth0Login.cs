@@ -33,7 +33,7 @@ namespace Jellypic.Web.Services
                     user.CreatedAt = DateTime.UtcNow;
                 }
 
-                user.Username = securityToken.Claims.First(c => c.Type == "nickname").Value;
+                user.Nickname = securityToken.Claims.First(c => c.Type == "nickname").Value;
                 user.AuthType = "Auth0";
                 user.AuthUserId = auth0UserId;
                 user.FirstName = securityToken.Claims.First(c => c.Type == "name").Value;

@@ -65,7 +65,7 @@ namespace Jellypic.Web.Events
                 await WebPushSender.SendAsync(subscription.Endpoint, subscription.P256DH, subscription.Auth, new
                 {
                     title = $"New {e.Data.Type}",
-                    message = $"From {actor.FirstName} {actor.LastName} (@{actor.Username})",
+                    message = $"From {actor.FirstName} {actor.LastName} (@{actor.Nickname})",
                     postId = e.Data.Post.Id,
                     icon = actor.PictureUrl, // At least 192px recommended: https://developers.google.com/web/fundamentals/push-notifications/display-a-notification
                     image = cloudinary.FourThreeRatio(e.Data.Post.CloudinaryPublicId, 1350) // Suggest 4:3 ratio up to 1350px wide: https://developers.google.com/web/fundamentals/push-notifications/display-a-notification

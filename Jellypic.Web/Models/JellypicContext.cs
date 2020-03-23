@@ -28,13 +28,9 @@ namespace Jellypic.Web.Models
             modelBuilder.Entity<User>(entity =>
             {
                 entity
-                    .Property(u => u.Username)
+                    .Property(u => u.Nickname)
                     .HasMaxLength(200)
                     .IsRequired();
-
-                entity
-                    .HasIndex(u => u.Username)
-                    .IsUnique();
 
                 entity
                     .Property(u => u.FirstName)
@@ -141,7 +137,7 @@ namespace Jellypic.Web.Models
     public class User
     {
         public int Id { get; set; }
-        public string Username { get; set; }
+        public string Nickname { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -201,7 +197,7 @@ namespace Jellypic.Web.Models
             new
             {
                 Id,
-                Username,
+                Nickname,
                 FirstName,
                 LastName,
                 PictureUrl,
