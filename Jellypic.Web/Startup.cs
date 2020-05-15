@@ -61,7 +61,7 @@ namespace Jellypic.Web
             services.AddSingleton<PostsAddedSubscriptionService>();
             services.AddSingleton<PostUpdatedSubscriptionService>();
             services.AddDbContext<JellypicContext>(options => options.UseSqlServer(Configuration.GetSection("ConnectionStrings")?["DefaultConnection"]), ServiceLifetime.Transient);
-            services.AddTransient<Func<JellypicContext>>(options => () => options.GetService<JellypicContext>());
+            services.AddSingleton<Func<JellypicContext>>(options => () => options.GetService<JellypicContext>()); // https://github.com/graphql-dotnet/graphql-dotnet/issues/863#issuecomment-629059126
 
             services.AddScoped<JellypicSchema>();
             services
